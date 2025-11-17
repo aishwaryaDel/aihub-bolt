@@ -6,7 +6,7 @@
 [![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-5.4.2-646CFF.svg)](https://vitejs.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.1-38B2AC.svg)](https://tailwindcss.com)
-[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E.svg)](https://supabase.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Backend-336791.svg)](https://www.postgresql.org/)
 
 ---
 
@@ -81,7 +81,7 @@ The **Tesa AI Hub** is an internal web application designed to centralize and sh
 - **Type Safety**: Full TypeScript implementation
 - **Modern UI**: Tailwind CSS with custom design system
 - **Performance**: Vite for lightning-fast development and builds
-- **Database Integration**: Supabase for backend services
+- **Database Integration**: Azure PostgreSQL for backend services
 - **Scalable Architecture**: Component-based design with clear separation of concerns
 - **Configuration Management**: Centralized config for all settings
 
@@ -118,11 +118,10 @@ The application follows a modern single-page application (SPA) architecture:
                  │ HTTP/REST API
                  │
 ┌────────────────┴────────────────────────────────┐
-│              Supabase Backend                    │
-│   - PostgreSQL Database                          │
+│           Backend API (Express)                  │
+│   - Node.js + TypeScript                         │
 │   - REST API                                     │
-│   - Row Level Security                           │
-│   - Real-time Subscriptions                      │
+│   - Azure PostgreSQL Database                    │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -188,9 +187,10 @@ App (Root)
 
 | Technology | Purpose |
 |------------|---------|
-| **Supabase** | Backend-as-a-Service providing database, authentication, and storage |
-| **PostgreSQL** | Relational database (via Supabase) |
-| **REST API** | Auto-generated from database schema |
+| **Node.js** | JavaScript runtime for backend server |
+| **Express** | Web application framework for REST API |
+| **PostgreSQL** | Relational database (Azure PostgreSQL) |
+| **pg** | PostgreSQL client for Node.js |
 
 ### Development Tools
 
@@ -249,13 +249,12 @@ touch .env
 Add the following environment variables:
 
 ```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
+VITE_API_URL=http://localhost:3001
 ```
 
 **Important**:
 - Never commit the `.env` file to version control
-- Get the actual values from your Supabase project dashboard
+- Update the API URL for production deployment
 - The `.env` file is already in `.gitignore`
 
 ---
@@ -266,8 +265,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 
 All application configuration is centralized in `src/config/index.ts`. This file contains:
 
-- **Environment Variables**: Supabase URL and keys
-- **Database Configuration**: Table names and schema
+- **Environment Variables**: API URL
 - **API Endpoints**: REST API endpoint definitions
 - **Feature Flags**: Enable/disable features
 - **Constants**: Departments, statuses, colors, validation rules
@@ -465,75 +463,47 @@ Multi-step form wizard with:
 
 ## 🗄️ Database Setup
 
-### Supabase Configuration
+### Azure PostgreSQL Configuration
 
-1. **Create a Supabase Project**:
-   - Go to [Supabase](https://supabase.com)
-   - Create a new project
-   - Note your project URL and anon key
+1. **Configure Azure PostgreSQL**:
+   - Set up your Azure PostgreSQL instance
+   - Configure firewall rules to allow your application's IP
+   - Note your connection credentials
 
-2. **Database Schema**:
+2. **Backend Environment Variables**:
 
-```sql
--- Create use_cases table
-CREATE TABLE use_cases (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  short_description TEXT NOT NULL,
-  full_description TEXT NOT NULL,
-  department TEXT NOT NULL,
-  status TEXT NOT NULL,
-  owner_name TEXT NOT NULL,
-  owner_email TEXT NOT NULL,
-  image_url TEXT,
-  business_impact TEXT,
-  technology_stack TEXT[] DEFAULT '{}',
-  internal_links JSONB DEFAULT '{}',
-  tags TEXT[] DEFAULT '{}',
-  related_use_case_ids TEXT[] DEFAULT '{}',
-  application_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+Create a `.env` file in the `backend/` directory:
 
--- Enable Row Level Security
-ALTER TABLE use_cases ENABLE ROW LEVEL SECURITY;
+```env
+PORT=3001
+NODE_ENV=development
 
--- Create policies for public read access
-CREATE POLICY "Allow public read access"
-  ON use_cases FOR SELECT
-  TO public
-  USING (true);
-
--- Create policy for authenticated insert
-CREATE POLICY "Allow authenticated insert"
-  ON use_cases FOR INSERT
-  TO authenticated
-  WITH CHECK (true);
-
--- Create indexes for performance
-CREATE INDEX idx_use_cases_department ON use_cases(department);
-CREATE INDEX idx_use_cases_status ON use_cases(status);
-CREATE INDEX idx_use_cases_created_at ON use_cases(created_at DESC);
-
--- Create updated_at trigger
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_use_cases_updated_at
-  BEFORE UPDATE ON use_cases
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
+DB_HOST=your-database-host
+DB_PORT=5432
+DB_USER=your-database-user
+DB_PASSWORD=your-database-password
+DB_NAME=your-database-name
+DB_SSL=true
 ```
 
-3. **Seed Sample Data** (optional):
+3. **Run Migrations**:
 
-Use the data from `src/data/sampleData.ts` to populate the database through Supabase dashboard or API.
+```bash
+cd backend
+node src/scripts/runMigration.js
+```
+
+This will create the `use_cases` table with all required columns and indexes.
+
+4. **Start Backend Server**:
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+The backend API will be available at `http://localhost:3001`
 
 ---
 
@@ -697,9 +667,19 @@ npm run build
 
 Ensure these are set in your hosting platform:
 
+Frontend:
 ```
-VITE_SUPABASE_URL=your-production-url
-VITE_SUPABASE_ANON_KEY=your-production-key
+VITE_API_URL=your-production-api-url
+```
+
+Backend:
+```
+DB_HOST=your-production-db-host
+DB_PORT=5432
+DB_USER=your-db-user
+DB_PASSWORD=your-db-password
+DB_NAME=your-db-name
+DB_SSL=true
 ```
 
 ---
@@ -723,13 +703,13 @@ npm run dev -- --port 3000
 
 #### Environment Variables Not Loading
 
-**Problem**: Supabase connection fails
+**Problem**: API connection fails
 
 **Solution**:
-1. Ensure `.env` file exists in project root
-2. Check variable names start with `VITE_`
-3. Restart the development server
-4. Verify values are correct in Supabase dashboard
+1. Ensure `.env` file exists in project root (frontend) and backend directory
+2. Check frontend variable names start with `VITE_`
+3. Verify backend server is running on the correct port
+4. Restart both frontend and backend servers
 
 #### TypeScript Errors
 
@@ -768,7 +748,8 @@ npm install --save-dev @types/react @types/react-dom
 - [React Documentation](https://react.dev)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [Tailwind CSS Docs](https://tailwindcss.com/docs)
-- [Supabase Documentation](https://supabase.com/docs)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [Express.js Documentation](https://expressjs.com/)
 - [Vite Guide](https://vitejs.dev/guide/)
 
 ---
@@ -799,7 +780,7 @@ Built with modern web technologies and best practices to provide a world-class e
 - React + TypeScript for robust, type-safe development
 - Vite for blazing-fast builds and development experience
 - Tailwind CSS for beautiful, consistent design
-- Supabase for scalable backend infrastructure
+- Express + PostgreSQL for scalable backend infrastructure
 
 ---
 
