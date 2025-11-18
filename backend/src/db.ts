@@ -26,3 +26,5 @@ export async function query(text: string, params?: any[]) {
 pool.connect()
   .then(() => console.log('✅ Erfolgreich mit Azure PostgreSQL verbunden'))
   .catch((err: unknown) => console.error('❌ Datenbankverbindung fehlgeschlagen:', err));
+
+  
