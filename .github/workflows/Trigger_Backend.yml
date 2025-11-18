@@ -31,8 +31,9 @@ jobs:
     uses: aishwaryaDel/docker_image/.github/workflows/Docker_backend_call.yml@main
     with:
       environment: "dev"
-      image_name: "backend-dev"
+      image_name: "backend-dev-bolt"
       image_tag: ${{ github.sha }}
       acr_name: "acrtesadevgwc"
     secrets:
       azure_creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+      docker_env: ${{ secrets.DOCKER_ENV_DEV }} 
