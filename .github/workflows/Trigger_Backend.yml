@@ -1,0 +1,28 @@
+name: Trigger Common Docker Pipeline 
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'backend/**'
+
+jobs:
+  trigger-common-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Docker Backend pipeline
+        run: |
+          curl -X POST \
+          -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+          -H "Accept: application/vnd.github.everest-preview+json" \
+          https://api.github.com/repos/aishwaryaDel/docker_image/dispatches \
+          -d '{
+            "event_type": "backend-update",
+            "client_payload": {
+              "environment": "dev",
+              "acr_name": "acrtesadevgwc", 
+              "image_name": "backend-dev",
+              "commit_sha": "${{ github.sha }}"
+            }
+          }'
