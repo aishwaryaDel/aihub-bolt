@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import useCaseRoutes from './routes/useCaseRoutes';
+import userRoutes from './routes/userRoutes';
 import authRoutes from './auth'
 
 // Environment Variablen laden (.env)
@@ -18,6 +19,7 @@ app.use(express.json());
 
 // Basis-Routen
 app.use('/api/use-cases', useCaseRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 
 // Health Check Endpoint
