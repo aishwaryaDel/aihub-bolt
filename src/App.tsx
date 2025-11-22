@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import LandingPage from './components/LandingPage';
 import UseCaseOverview from './components/UseCaseOverview';
+import LoginModal from './components/LoginModal';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { UseCase } from './types';
 import { useCaseApi } from './services/api';
@@ -12,6 +13,9 @@ function App() {
   const [useCases, setUseCases] = useState<UseCase[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const fetchUseCases = async () => {
     setIsLoading(true);
@@ -32,10 +36,20 @@ function App() {
     }
   }, [currentScreen]);
 
+  const handleStartJourney = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  const handleLoginSuccess = (token: string, user: any) => {
+    setAuthToken(token);
+    setCurrentUser(user);
+    setCurrentScreen('overview');
+  };
+
   return (
     <LanguageProvider>
       {currentScreen === 'landing' ? (
-        <LandingPage onStartJourney={() => setCurrentScreen('overview')} />
+        <LandingPage onStartJourney={handleStartJourney} />
       ) : (
         <UseCaseOverview
           useCases={useCases}
@@ -45,6 +59,11 @@ function App() {
           onRefresh={fetchUseCases}
         />
       )}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </LanguageProvider>
   );
 }

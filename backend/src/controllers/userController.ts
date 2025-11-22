@@ -174,6 +174,10 @@ export class UserController {
       return 'Valid email is required';
     }
 
+    if (!data.password || data.password.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+
     if (!data.name || data.name.trim().length === 0) {
       return 'Name is required';
     }

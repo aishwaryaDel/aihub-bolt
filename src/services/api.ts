@@ -10,6 +10,21 @@ interface ApiResponse<T> {
   count?: number;
 }
 
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface AuthResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  };
+}
+
 class UseCaseApiService {
   private async fetchWithErrorHandling<T>(
     url: string,
@@ -81,4 +96,45 @@ class UseCaseApiService {
   }
 }
 
+class AuthApiService {
+  private async fetchWithErrorHandling<T>(
+    url: string,
+    options?: RequestInit
+  ): Promise<T> {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options?.headers,
+        },
+      });
+
+      const data: ApiResponse<T> = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      }
+
+      return data.data as T;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('An unexpected error occurred');
+    }
+  }
+
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    return this.fetchWithErrorHandling<AuthResponse>(
+      `${API_BASE_URL}/auth/login`,
+      {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+      }
+    );
+  }
+}
+
 export const useCaseApi = new UseCaseApiService();
+export const authApi = new AuthApiService();

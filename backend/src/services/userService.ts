@@ -1,14 +1,15 @@
 import { query } from '../config/database';
 import { User, CreateUserDTO, UpdateUserDTO } from '../models/User';
+import { authService } from './authService';
 
 export class UserService {
   async getAllUsers(): Promise<User[]> {
-    const result = await query('SELECT * FROM users ORDER BY created_at DESC');
+    const result = await query('SELECT id, email, name, role, created_at, updated_at FROM users ORDER BY created_at DESC');
     return result.rows as User[];
   }
 
   async getUserById(id: string): Promise<User | null> {
-    const result = await query('SELECT * FROM users WHERE id = $1', [id]);
+    const result = await query('SELECT id, email, name, role, created_at, updated_at FROM users WHERE id = $1', [id]);
 
     if (result.rowCount === 0) {
       return null;
@@ -18,14 +19,16 @@ export class UserService {
   }
 
   async createUser(userData: CreateUserDTO): Promise<User> {
-    const { email, name, role } = userData;
+    const { email, password, name, role } = userData;
+
+    const hashedPassword = await authService.hashPassword(password);
 
     const result = await query(
       `INSERT INTO users (
-        email, name, role, created_at, updated_at
-      ) VALUES ($1, $2, $3, NOW(), NOW())
-      RETURNING *`,
-      [email, name, role]
+        email, password, name, role, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, NOW(), NOW())
+      RETURNING id, email, name, role, created_at, updated_at`,
+      [email, hashedPassword, name, role]
     );
 
     return result.rows[0] as User;
@@ -40,6 +43,11 @@ export class UserService {
       fields.push(`email = $${paramIndex++}`);
       values.push(updates.email);
     }
+    if (updates.password !== undefined) {
+      const hashedPassword = await authService.hashPassword(updates.password);
+      fields.push(`password = $${paramIndex++}`);
+      values.push(hashedPassword);
+    }
     if (updates.name !== undefined) {
       fields.push(`name = $${paramIndex++}`);
       values.push(updates.name);
@@ -50,7 +58,7 @@ export class UserService {
     }
 
     if (fields.length === 0) {
-      const result = await query('SELECT * FROM users WHERE id = $1', [id]);
+      const result = await query('SELECT id, email, name, role, created_at, updated_at FROM users WHERE id = $1', [id]);
       return result.rows[0] as User || null;
     }
 
@@ -58,7 +66,7 @@ export class UserService {
     values.push(id);
 
     const result = await query(
-      `UPDATE users SET ${fields.join(', ')} WHERE id = $${paramIndex} RETURNING *`,
+      `UPDATE users SET ${fields.join(', ')} WHERE id = $${paramIndex} RETURNING id, email, name, role, created_at, updated_at`,
       values
     );
 
