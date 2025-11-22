@@ -177,7 +177,18 @@ const translations: Record<Language, Record<string, string>> = {
     'newUseCase.add': 'Hinzufügen',
     'newUseCase.back': 'Zurück',
     'newUseCase.next': 'Weiter',
-    'newUseCase.submit': 'Absenden'
+    'newUseCase.submit': 'Absenden',
+    'login.title': 'Willkommen im tesa AI Hub',
+    'login.email': 'E-Mail oder Benutzername',
+    'login.emailPlaceholder': 'E-Mail oder Benutzername',
+    'login.password': 'Passwort',
+    'login.passwordPlaceholder': 'Passwort',
+    'login.loginButton': 'Anmelden',
+    'login.loggingIn': 'Anmeldung läuft...',
+    'login.forgotPassword': 'Passwort vergessen?',
+    'login.fillAllFields': 'Bitte füllen Sie alle Felder aus',
+    'login.loginFailed': 'Anmeldung fehlgeschlagen',
+    'login.connectionFailed': 'Verbindung zum Server fehlgeschlagen'
   }
 };
 
