@@ -7,6 +7,7 @@ import UseCaseDetailModal from './UseCaseDetailModal';
 import NewUseCaseModal, { NewUseCaseData } from './NewUseCaseModal';
 import Footer from './Footer';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
 
 interface UseCaseOverviewProps {
@@ -40,6 +41,7 @@ const statuses: Array<'All' | UseCaseStatus> = [
 
 export default function UseCaseOverview({ useCases, onBackToHome, isLoading = false, error = null, onRefresh }: UseCaseOverviewProps) {
   const { t } = useLanguage();
+  const { isAdmin } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState<'All' | Department>('All');
   const [selectedStatus, setSelectedStatus] = useState<'All' | UseCaseStatus>('All');
@@ -111,13 +113,15 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
               </h1>
             </div>
             <div className="flex items-center justify-end gap-3">
-              <button
-                onClick={() => setShowNewUseCaseModal(true)}
-                className="flex items-center gap-2 px-4 py-2 text-white bg-[#E30613] rounded-lg hover:bg-[#c00510] transition-colors duration-200"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('overview.newUseCase')}</span>
-              </button>
+              {isAdmin() && (
+                <button
+                  onClick={() => setShowNewUseCaseModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 text-white bg-[#E30613] rounded-lg hover:bg-[#c00510] transition-colors duration-200"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t('overview.newUseCase')}</span>
+                </button>
+              )}
               <LanguageSwitcher />
             </div>
           </div>

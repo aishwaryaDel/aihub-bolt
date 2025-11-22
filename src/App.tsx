@@ -3,19 +3,19 @@ import LandingPage from './components/LandingPage';
 import UseCaseOverview from './components/UseCaseOverview';
 import LoginModal from './components/LoginModal';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { UseCase } from './types';
 import { useCaseApi } from './services/api';
 
 type Screen = 'landing' | 'overview';
 
-function App() {
+function AppContent() {
+  const { login, logout, isAuthenticated } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [useCases, setUseCases] = useState<UseCase[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const fetchUseCases = async () => {
     setIsLoading(true);
@@ -31,7 +31,7 @@ function App() {
   };
 
   useEffect(() => {
-    if (currentScreen === 'overview') {
+    if (currentScreen === 'overview' && isAuthenticated()) {
       fetchUseCases();
     }
   }, [currentScreen]);
@@ -41,19 +41,23 @@ function App() {
   };
 
   const handleLoginSuccess = (token: string, user: any) => {
-    setAuthToken(token);
-    setCurrentUser(user);
+    login(token, user);
     setCurrentScreen('overview');
   };
 
+  const handleBackToHome = () => {
+    logout();
+    setCurrentScreen('landing');
+  };
+
   return (
-    <LanguageProvider>
+    <>
       {currentScreen === 'landing' ? (
         <LandingPage onStartJourney={handleStartJourney} />
       ) : (
         <UseCaseOverview
           useCases={useCases}
-          onBackToHome={() => setCurrentScreen('landing')}
+          onBackToHome={handleBackToHome}
           isLoading={isLoading}
           error={error}
           onRefresh={fetchUseCases}
@@ -64,6 +68,16 @@ function App() {
         onClose={() => setIsLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
       />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <LanguageProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </LanguageProvider>
   );
 }
