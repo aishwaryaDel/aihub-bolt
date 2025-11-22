@@ -83,13 +83,13 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
           </div>
 
           <h2 className="text-3xl font-bold text-white text-center mb-8">
-            Welcome to tesa AI Hub
+           Login
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-                Email or username
+                Email
               </label>
               <input
                 type="email"
