@@ -47,6 +47,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
   const [selectedStatus, setSelectedStatus] = useState<'All' | UseCaseStatus>('All');
   const [selectedUseCase, setSelectedUseCase] = useState<UseCase | null>(null);
   const [showNewUseCaseModal, setShowNewUseCaseModal] = useState(false);
+  const [useCaseToUpdate, setUseCaseToUpdate] = useState<UseCase | null>(null);
 
   const filteredUseCases = useMemo(() => {
     return useCases.filter((useCase) => {
@@ -79,12 +80,23 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
     }
   };
 
-  const handleNewUseCaseSubmit = async (data: NewUseCaseData) => {
+  const handleNewUseCaseSubmit = async (data: NewUseCaseData, useCaseId?: string) => {
     try {
-      await useCaseApi.createUseCase(data);
+      if (useCaseId) {
+        await useCaseApi.updateUseCase(useCaseId, data);
+      } else {
+        await useCaseApi.createUseCase(data);
+      }
       if (onRefresh) onRefresh();
     } catch (error) {
-      console.error('Failed to create use case:', error);
+      console.error('Failed to save use case:', error);
+    }
+  };
+
+  const handleCardClick = (useCase: UseCase) => {
+    if (isAdmin()) {
+      setUseCaseToUpdate(useCase);
+      setShowNewUseCaseModal(true);
     }
   };
 
@@ -207,7 +219,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
                   <UseCaseCard
                     key={useCase.id}
                     useCase={useCase}
-                    onClick={() => setSelectedUseCase(useCase)}
+                    onClick={() => handleCardClick(useCase)}
                   />
                 ))}
               </div>
@@ -229,8 +241,12 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
 
       {showNewUseCaseModal && (
         <NewUseCaseModal
-          onClose={() => setShowNewUseCaseModal(false)}
+          onClose={() => {
+            setShowNewUseCaseModal(false);
+            setUseCaseToUpdate(null);
+          }}
           onSubmit={handleNewUseCaseSubmit}
+          existingUseCase={useCaseToUpdate}
         />
       )}
     </div>
