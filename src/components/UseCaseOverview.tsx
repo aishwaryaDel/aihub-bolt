@@ -97,6 +97,8 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
     if (isAdmin()) {
       setUseCaseToUpdate(useCase);
       setShowNewUseCaseModal(true);
+    } else {
+      setSelectedUseCase(useCase);
     }
   };
 
