@@ -47,6 +47,9 @@ function AppContent() {
 
   const handleBackToHome = () => {
     logout();
+    setUseCases([]);
+    setError(null);
+    setIsLoginModalOpen(false);
     setCurrentScreen('landing');
   };
 
