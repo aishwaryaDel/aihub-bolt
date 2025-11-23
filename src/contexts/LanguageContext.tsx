@@ -58,6 +58,7 @@ const translations: Record<Language, Record<string, string>> = {
     'status.Live': 'Live',
     'status.Archived': 'Archived',
     'newUseCase.title': 'Create New Use Case',
+    'updateUseCase.title': 'Update Use Case',
     'newUseCase.step': 'Step',
     'newUseCase.of': 'of',
     'newUseCase.basicInfo': 'Basic Information',
@@ -92,7 +93,18 @@ const translations: Record<Language, Record<string, string>> = {
     'newUseCase.add': 'Add',
     'newUseCase.back': 'Back',
     'newUseCase.next': 'Next',
-    'newUseCase.submit': 'Submit'
+    'newUseCase.submit': 'Submit',
+    'login.title': 'Login',
+    'login.email': 'Email',
+    'login.emailPlaceholder': 'email',
+    'login.password': 'Password',
+    'login.passwordPlaceholder': 'password',
+    'login.loginButton': 'Login',
+    'login.loggingIn': 'Logging in...',
+    'login.forgotPassword': 'Forgot your password?',
+    'login.fillAllFields': 'Please fill in all fields',
+    'login.loginFailed': 'Login failed',
+    'login.connectionFailed': 'Failed to connect to server'
   },
   de: {
     'landing.title': 'Willkommen im Tesa AI Hub',
@@ -143,6 +155,7 @@ const translations: Record<Language, Record<string, string>> = {
     'status.Live': 'Live',
     'status.Archived': 'Archiviert',
     'newUseCase.title': 'Neuen Use Case erstellen',
+    'updateUseCase.title':'Use Case aktualisieren',
     'newUseCase.step': 'Schritt',
     'newUseCase.of': 'von',
     'newUseCase.basicInfo': 'Grundinformationen',
@@ -177,7 +190,18 @@ const translations: Record<Language, Record<string, string>> = {
     'newUseCase.add': 'Hinzufügen',
     'newUseCase.back': 'Zurück',
     'newUseCase.next': 'Weiter',
-    'newUseCase.submit': 'Absenden'
+    'newUseCase.submit': 'Absenden',
+    'login.title': 'Login',
+    'login.email': 'E-Mail',
+    'login.emailPlaceholder': 'E-Mail',
+    'login.password': 'Passwort',
+    'login.passwordPlaceholder': 'Passwort',
+    'login.loginButton': 'Login',
+    'login.loggingIn': 'Anmeldung läuft...',
+    'login.forgotPassword': 'Passwort vergessen?',
+    'login.fillAllFields': 'Bitte füllen Sie alle Felder aus',
+    'login.loginFailed': 'Anmeldung fehlgeschlagen',
+    'login.connectionFailed': 'Verbindung zum Server fehlgeschlagen'
   }
 };
 

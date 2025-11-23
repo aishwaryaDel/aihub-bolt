@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Department, UseCaseStatus } from '../types';
+import { Department, UseCaseStatus, UseCase } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface NewUseCaseModalProps {
   onClose: () => void;
-  onSubmit: (data: NewUseCaseData) => void;
+  onSubmit: (data: NewUseCaseData, useCaseId?: string) => void;
+  existingUseCase?: UseCase | null;
 }
 
 export interface NewUseCaseData {
@@ -31,10 +32,11 @@ export interface NewUseCaseData {
 const departments: Department[] = ['Marketing', 'R&D', 'Procurement', 'IT', 'HR', 'Operations'];
 const statuses: UseCaseStatus[] = ['Ideation', 'Pre-Evaluation', 'Evaluation', 'PoC', 'MVP', 'Live'];
 
-export default function NewUseCaseModal({ onClose, onSubmit }: NewUseCaseModalProps) {
+export default function NewUseCaseModal({ onClose, onSubmit, existingUseCase = null }: NewUseCaseModalProps) {
   const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
+  const isUpdateMode = !!existingUseCase;
 
   const [formData, setFormData] = useState<NewUseCaseData>({
     title: '',
@@ -54,6 +56,25 @@ export default function NewUseCaseModal({ onClose, onSubmit }: NewUseCaseModalPr
   const [techStackInput, setTechStackInput] = useState('');
   const [tagsInput, setTagsInput] = useState('');
 
+  useEffect(() => {
+    if (existingUseCase) {
+      setFormData({
+        title: existingUseCase.title,
+        short_description: existingUseCase.short_description,
+        full_description: existingUseCase.full_description,
+        department: existingUseCase.department,
+        status: existingUseCase.status,
+        owner_name: existingUseCase.owner_name,
+        owner_email: existingUseCase.owner_email,
+        business_impact: existingUseCase.business_impact,
+        technology_stack: existingUseCase.technology_stack,
+        tags: existingUseCase.tags,
+        application_url: existingUseCase.application_url || '',
+        internal_links: existingUseCase.internal_links || {}
+      });
+    }
+  }, [existingUseCase]);
+
   const handleNext = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
@@ -67,7 +88,11 @@ export default function NewUseCaseModal({ onClose, onSubmit }: NewUseCaseModalPr
   };
 
   const handleSubmit = () => {
-    onSubmit(formData);
+    if (isUpdateMode && existingUseCase) {
+      onSubmit(formData, existingUseCase.id);
+    } else {
+      onSubmit(formData);
+    }
     onClose();
   };
 
@@ -136,7 +161,7 @@ export default function NewUseCaseModal({ onClose, onSubmit }: NewUseCaseModalPr
         <div className="flex-shrink-0 px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-gray-900">
-              {t('newUseCase.title')}
+              {isUpdateMode ? t('updateUseCase.title') : t('newUseCase.title')}
             </h2>
             <button
               onClick={onClose}
@@ -477,7 +502,7 @@ export default function NewUseCaseModal({ onClose, onSubmit }: NewUseCaseModalPr
               onClick={handleSubmit}
               className="px-6 py-2 bg-[#E30613] text-white rounded-lg hover:bg-[#c00510] transition-colors"
             >
-              {t('newUseCase.submit')}
+              {isUpdateMode ? 'Update' : t('newUseCase.submit')}
             </button>
           )}
         </div>

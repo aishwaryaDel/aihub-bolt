@@ -43,6 +43,10 @@ export const api = {
   baseUrl: env.api.baseUrl,
   endpoints: {
     useCases: '/use-cases',
+    useCaseById: (id: string) => `/use-cases/${id}`,
+    auth: {
+      login: '/auth/login',
+    },
   },
 } as const;
 
@@ -149,6 +153,29 @@ export const externalLinks = {
 } as const;
 
 /**
+ * Error Messages Configuration
+ * Centralized error messages and UI text
+ */
+export const messages = {
+  errors: {
+    http: (status: number) => `HTTP error! status: ${status}`,
+    unexpected: 'An unexpected error occurred',
+    loadUseCases: 'Failed to load use cases',
+    saveUseCase: 'Failed to save use case',
+    errorLoadingUseCases: 'Error loading use cases',
+  },
+  loading: {
+    useCases: 'Loading use cases...',
+  },
+  actions: {
+    retry: 'Retry',
+  },
+  placeholders: {
+    applicationUrl: 'https://...',
+  },
+} as const;
+
+/**
  * Validates that all required environment variables are present
  * @throws {Error} If required environment variables are missing
  */
@@ -172,6 +199,7 @@ export default {
   constants,
   ui,
   externalLinks,
+  messages,
   validateConfig,
   getApiUrl,
 };

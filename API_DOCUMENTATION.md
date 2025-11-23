@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides comprehensive documentation for the Use Case CRUD API. The API is built with Node.js, TypeScript, Express, and uses Supabase PostgreSQL as the database.
+This document provides comprehensive documentation for the Use Case CRUD API. The API is built with Node.js, TypeScript, Express, and uses Azure PostgreSQL as the database.
 
 ## Base URL
 
@@ -295,8 +295,12 @@ Create a `.env` file in the backend directory:
 PORT=3001
 NODE_ENV=development
 
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+DB_HOST=your_database_host
+DB_PORT=5432
+DB_USER=your_database_user
+DB_PASSWORD=your_database_password
+DB_NAME=your_database_name
+DB_SSL=true
 ```
 
 ## Testing with Postman
@@ -361,7 +365,7 @@ Content-Type: application/json
 backend/
 ├── src/
 │   ├── config/
-│   │   └── database.ts         # Supabase client configuration
+│   │   └── database.ts         # PostgreSQL client configuration
 │   ├── models/
 │   │   └── UseCase.ts          # TypeScript interfaces and types
 │   ├── services/
@@ -371,10 +375,8 @@ backend/
 │   ├── routes/
 │   │   └── useCaseRoutes.ts    # API route definitions
 │   └── server.ts               # Express server setup
-├── db/
-│   └── migrations/
-│       ├── 002_create_use_cases_table.sql
-│       └── 003_seed_sample_use_cases.sql
+├── migrations/
+│   └── 001_create_use_cases_table.sql
 ├── .env                        # Environment variables
 ├── package.json
 └── tsconfig.json

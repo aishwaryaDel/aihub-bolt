@@ -1,32 +1,14 @@
 import { UseCase } from '../types';
+import { constants } from '../config';
 
 interface UseCaseCardProps {
   useCase: UseCase;
   onClick: () => void;
 }
 
-const statusColors: Record<string, string> = {
-  Live: 'bg-green-600',
-  MVP: 'bg-blue-600',
-  PoC: 'bg-orange-500',
-  Evaluation: 'bg-yellow-600',
-  'Pre-Evaluation': 'bg-purple-600',
-  Ideation: 'bg-gray-500',
-  Archived: 'bg-gray-400'
-};
-
-const defaultImages: Record<string, string> = {
-  Marketing: 'https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'R&D': 'https://images.pexels.com/photos/2280571/pexels-photo-2280571.jpeg?auto=compress&cs=tinysrgb&w=800',
-  Procurement: 'https://images.pexels.com/photos/6476589/pexels-photo-6476589.jpeg?auto=compress&cs=tinysrgb&w=800',
-  IT: 'https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=800',
-  HR: 'https://images.pexels.com/photos/5668858/pexels-photo-5668858.jpeg?auto=compress&cs=tinysrgb&w=800',
-  Operations: 'https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg?auto=compress&cs=tinysrgb&w=800'
-};
-
 export default function UseCaseCard({ useCase, onClick }: UseCaseCardProps) {
-  const departmentImage = defaultImages[useCase.department];
-  const statusColor = statusColors[useCase.status] || 'bg-gray-500';
+  const departmentImage = constants.defaultImages[useCase.department as keyof typeof constants.defaultImages];
+  const statusColor = constants.statusColors[useCase.status as keyof typeof constants.statusColors] || 'bg-gray-500';
 
   return (
     <div

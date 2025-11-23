@@ -7,7 +7,9 @@ import UseCaseDetailModal from './UseCaseDetailModal';
 import NewUseCaseModal, { NewUseCaseData } from './NewUseCaseModal';
 import Footer from './Footer';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import { messages } from '../config';
 
 interface UseCaseOverviewProps {
   useCases: UseCase[];
@@ -40,11 +42,13 @@ const statuses: Array<'All' | UseCaseStatus> = [
 
 export default function UseCaseOverview({ useCases, onBackToHome, isLoading = false, error = null, onRefresh }: UseCaseOverviewProps) {
   const { t } = useLanguage();
+  const { isAdmin } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState<'All' | Department>('All');
   const [selectedStatus, setSelectedStatus] = useState<'All' | UseCaseStatus>('All');
   const [selectedUseCase, setSelectedUseCase] = useState<UseCase | null>(null);
   const [showNewUseCaseModal, setShowNewUseCaseModal] = useState(false);
+  const [useCaseToUpdate, setUseCaseToUpdate] = useState<UseCase | null>(null);
 
   const filteredUseCases = useMemo(() => {
     return useCases.filter((useCase) => {
@@ -77,12 +81,25 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
     }
   };
 
-  const handleNewUseCaseSubmit = async (data: NewUseCaseData) => {
+  const handleNewUseCaseSubmit = async (data: NewUseCaseData, useCaseId?: string) => {
     try {
-      await useCaseApi.createUseCase(data);
+      if (useCaseId) {
+        await useCaseApi.updateUseCase(useCaseId, data);
+      } else {
+        await useCaseApi.createUseCase(data);
+      }
       if (onRefresh) onRefresh();
     } catch (error) {
-      console.error('Failed to create use case:', error);
+      console.error(messages.errors.saveUseCase, error);
+    }
+  };
+
+  const handleCardClick = (useCase: UseCase) => {
+    if (isAdmin()) {
+      setUseCaseToUpdate(useCase);
+      setShowNewUseCaseModal(true);
+    } else {
+      setSelectedUseCase(useCase);
     }
   };
 
@@ -111,13 +128,15 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
               </h1>
             </div>
             <div className="flex items-center justify-end gap-3">
-              <button
-                onClick={() => setShowNewUseCaseModal(true)}
-                className="flex items-center gap-2 px-4 py-2 text-white bg-[#E30613] rounded-lg hover:bg-[#c00510] transition-colors duration-200"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('overview.newUseCase')}</span>
-              </button>
+              {isAdmin() && (
+                <button
+                  onClick={() => setShowNewUseCaseModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 text-white bg-[#E30613] rounded-lg hover:bg-[#c00510] transition-colors duration-200"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t('overview.newUseCase')}</span>
+                </button>
+              )}
               <LanguageSwitcher />
             </div>
           </div>
@@ -167,7 +186,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between">
             <div>
-              <p className="text-red-800 font-medium">Error loading use cases</p>
+              <p className="text-red-800 font-medium">{messages.errors.errorLoadingUseCases}</p>
               <p className="text-red-600 text-sm mt-1">{error}</p>
             </div>
             {onRefresh && (
@@ -175,7 +194,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
                 onClick={onRefresh}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
               >
-                Retry
+                {messages.actions.retry}
               </button>
             )}
           </div>
@@ -184,7 +203,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#E30613]"></div>
-            <p className="mt-4 text-gray-600">Loading use cases...</p>
+            <p className="mt-4 text-gray-600">{messages.loading.useCases}</p>
           </div>
         ) : (
           <>
@@ -203,7 +222,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
                   <UseCaseCard
                     key={useCase.id}
                     useCase={useCase}
-                    onClick={() => setSelectedUseCase(useCase)}
+                    onClick={() => handleCardClick(useCase)}
                   />
                 ))}
               </div>
@@ -225,8 +244,12 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
 
       {showNewUseCaseModal && (
         <NewUseCaseModal
-          onClose={() => setShowNewUseCaseModal(false)}
+          onClose={() => {
+            setShowNewUseCaseModal(false);
+            setUseCaseToUpdate(null);
+          }}
           onSubmit={handleNewUseCaseSubmit}
+          existingUseCase={useCaseToUpdate}
         />
       )}
     </div>

@@ -1,10 +1,8 @@
 -- Create use_cases table
 -- This migration creates the main table for storing AI use cases in the Tesa AI Hub
 
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE IF NOT EXISTS use_cases (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(255) NOT NULL,
   short_description TEXT NOT NULL,
   full_description TEXT NOT NULL,
