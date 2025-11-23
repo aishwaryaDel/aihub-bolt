@@ -67,7 +67,8 @@ function AppContent() {
           onRefresh={fetchUseCases}
         />
       )}
-      <LoginModal
+        <LoginModal
+        key={isLoginModalOpen ? 'open' : 'closed'}
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
