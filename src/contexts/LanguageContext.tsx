@@ -58,6 +58,7 @@ const translations: Record<Language, Record<string, string>> = {
     'status.Live': 'Live',
     'status.Archived': 'Archived',
     'newUseCase.title': 'Create New Use Case',
+    'updateUseCase.title': 'Update Use Case',
     'newUseCase.step': 'Step',
     'newUseCase.of': 'of',
     'newUseCase.basicInfo': 'Basic Information',
