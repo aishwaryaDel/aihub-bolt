@@ -161,7 +161,7 @@ export default function NewUseCaseModal({ onClose, onSubmit, existingUseCase = n
         <div className="flex-shrink-0 px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-gray-900">
-              {isUpdateMode ? 'Update Use Case' : t('newUseCase.title')}
+              {isUpdateMode ? t('updateUseCase.title') : t('newUseCase.title')}
             </h2>
             <button
               onClick={onClose}
