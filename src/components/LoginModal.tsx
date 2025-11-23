@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { api } from '../config';
 import bcrypt from 'bcryptjs';
 
 interface LoginModalProps {
@@ -33,7 +34,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch(`${api.baseUrl}${api.endpoints.auth.login}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

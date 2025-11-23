@@ -1,6 +1,7 @@
 import { X } from 'lucide-react';
 import { UseCase } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
+import { constants } from '../config';
 
 interface UseCaseDetailModalProps {
   useCase: UseCase;
@@ -9,26 +10,7 @@ interface UseCaseDetailModalProps {
   onRelatedClick: (id: string) => void;
 }
 
-const statusColors: Record<string, string> = {
-  Live: 'bg-green-600',
-  MVP: 'bg-blue-600',
-  PoC: 'bg-orange-500',
-  Evaluation: 'bg-yellow-600',
-  'Pre-Evaluation': 'bg-purple-600',
-  Ideation: 'bg-gray-500',
-  Archived: 'bg-gray-400'
-};
-
 const stages = ['Ideation', 'Pre-Evaluation', 'Evaluation', 'PoC', 'MVP', 'Live', 'Archived'];
-
-const defaultImages: Record<string, string> = {
-  Marketing: 'https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'R&D': 'https://images.pexels.com/photos/2280571/pexels-photo-2280571.jpeg?auto=compress&cs=tinysrgb&w=800',
-  Procurement: 'https://images.pexels.com/photos/6476589/pexels-photo-6476589.jpeg?auto=compress&cs=tinysrgb&w=800',
-  IT: 'https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=800',
-  HR: 'https://images.pexels.com/photos/5668858/pexels-photo-5668858.jpeg?auto=compress&cs=tinysrgb&w=800',
-  Operations: 'https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg?auto=compress&cs=tinysrgb&w=800'
-};
 
 export default function UseCaseDetailModal({
   useCase,
@@ -37,8 +19,8 @@ export default function UseCaseDetailModal({
   onRelatedClick
 }: UseCaseDetailModalProps) {
   const { t } = useLanguage();
-  const imageUrl = useCase.image_url || defaultImages[useCase.department];
-  const statusColor = statusColors[useCase.status] || 'bg-gray-500';
+  const imageUrl = useCase.image_url || constants.defaultImages[useCase.department as keyof typeof constants.defaultImages];
+  const statusColor = constants.statusColors[useCase.status as keyof typeof constants.statusColors] || 'bg-gray-500';
   const currentStageIndex = stages.indexOf(useCase.status);
 
   return (

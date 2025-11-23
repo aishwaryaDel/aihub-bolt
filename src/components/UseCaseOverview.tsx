@@ -9,6 +9,7 @@ import Footer from './Footer';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import { messages } from '../config';
 
 interface UseCaseOverviewProps {
   useCases: UseCase[];
@@ -89,7 +90,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
       }
       if (onRefresh) onRefresh();
     } catch (error) {
-      console.error('Failed to save use case:', error);
+      console.error(messages.errors.saveUseCase, error);
     }
   };
 
@@ -185,7 +186,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between">
             <div>
-              <p className="text-red-800 font-medium">Error loading use cases</p>
+              <p className="text-red-800 font-medium">{messages.errors.errorLoadingUseCases}</p>
               <p className="text-red-600 text-sm mt-1">{error}</p>
             </div>
             {onRefresh && (
@@ -193,7 +194,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
                 onClick={onRefresh}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
               >
-                Retry
+                {messages.actions.retry}
               </button>
             )}
           </div>
@@ -202,7 +203,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#E30613]"></div>
-            <p className="mt-4 text-gray-600">Loading use cases...</p>
+            <p className="mt-4 text-gray-600">{messages.loading.useCases}</p>
           </div>
         ) : (
           <>

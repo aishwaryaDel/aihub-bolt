@@ -1,6 +1,5 @@
 import { UseCase, CreateUseCaseDTO, UpdateUseCaseDTO } from '../types';
-
-const API_BASE_URL = 'http://localhost:3001/api';
+import { api, messages } from '../config';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -42,7 +41,7 @@ class UseCaseApiService {
       const data: ApiResponse<T> = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+        throw new Error(data.error || messages.errors.http(response.status));
       }
 
       return data.data as T;
@@ -50,25 +49,25 @@ class UseCaseApiService {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('An unexpected error occurred');
+      throw new Error(messages.errors.unexpected);
     }
   }
 
   async getAllUseCases(): Promise<UseCase[]> {
     return this.fetchWithErrorHandling<UseCase[]>(
-      `${API_BASE_URL}/use-cases`
+      `${api.baseUrl}${api.endpoints.useCases}`
     );
   }
 
   async getUseCaseById(id: string): Promise<UseCase> {
     return this.fetchWithErrorHandling<UseCase>(
-      `${API_BASE_URL}/use-cases/${id}`
+      `${api.baseUrl}${api.endpoints.useCaseById(id)}`
     );
   }
 
   async createUseCase(useCaseData: CreateUseCaseDTO): Promise<UseCase> {
     return this.fetchWithErrorHandling<UseCase>(
-      `${API_BASE_URL}/use-cases`,
+      `${api.baseUrl}${api.endpoints.useCases}`,
       {
         method: 'POST',
         body: JSON.stringify(useCaseData),
@@ -78,7 +77,7 @@ class UseCaseApiService {
 
   async updateUseCase(id: string, updates: UpdateUseCaseDTO): Promise<UseCase> {
     return this.fetchWithErrorHandling<UseCase>(
-      `${API_BASE_URL}/use-cases/${id}`,
+      `${api.baseUrl}${api.endpoints.useCaseById(id)}`,
       {
         method: 'PUT',
         body: JSON.stringify(updates),
@@ -88,7 +87,7 @@ class UseCaseApiService {
 
   async deleteUseCase(id: string): Promise<void> {
     await this.fetchWithErrorHandling<void>(
-      `${API_BASE_URL}/use-cases/${id}`,
+      `${api.baseUrl}${api.endpoints.useCaseById(id)}`,
       {
         method: 'DELETE',
       }
@@ -113,7 +112,7 @@ class AuthApiService {
       const data: ApiResponse<T> = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+        throw new Error(data.error || messages.errors.http(response.status));
       }
 
       return data.data as T;
@@ -121,13 +120,13 @@ class AuthApiService {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('An unexpected error occurred');
+      throw new Error(messages.errors.unexpected);
     }
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     return this.fetchWithErrorHandling<AuthResponse>(
-      `${API_BASE_URL}/auth/login`,
+      `${api.baseUrl}${api.endpoints.auth.login}`,
       {
         method: 'POST',
         body: JSON.stringify(credentials),

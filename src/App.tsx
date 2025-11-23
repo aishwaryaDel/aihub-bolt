@@ -6,6 +6,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { UseCase } from './types';
 import { useCaseApi } from './services/api';
+import { messages } from './config';
 
 type Screen = 'landing' | 'overview';
 
@@ -24,7 +25,7 @@ function AppContent() {
       const data = await useCaseApi.getAllUseCases();
       setUseCases(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load use cases');
+      setError(err instanceof Error ? err.message : messages.errors.loadUseCases);
     } finally {
       setIsLoading(false);
     }
