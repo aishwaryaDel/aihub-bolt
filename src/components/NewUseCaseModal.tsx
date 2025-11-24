@@ -30,13 +30,32 @@ export interface NewUseCaseData {
 }
 
 const departments: Department[] = ['Marketing', 'R&D', 'Procurement', 'IT', 'HR', 'Operations'];
-const statuses: UseCaseStatus[] = ['Ideation', 'Pre-Evaluation', 'Evaluation', 'PoC', 'MVP', 'Live'];
+const statusSequence: UseCaseStatus[] = ['Ideation', 'Pre-Evaluation', 'Evaluation', 'PoC', 'MVP', 'Live', 'Archived'];
 
 export default function NewUseCaseModal({ onClose, onSubmit, existingUseCase = null }: NewUseCaseModalProps) {
   const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
   const isUpdateMode = !!existingUseCase;
+
+  const getAvailableStatuses = (): UseCaseStatus[] => {
+    if (!isUpdateMode) {
+      return ['Ideation'];
+    }
+
+    if (existingUseCase) {
+      const currentStatusIndex = statusSequence.indexOf(existingUseCase.status);
+      if (currentStatusIndex === -1) return ['Ideation'];
+
+      if (currentStatusIndex === statusSequence.length - 1) {
+        return [existingUseCase.status];
+      }
+
+      return [existingUseCase.status, statusSequence[currentStatusIndex + 1]];
+    }
+
+    return ['Ideation'];
+  };
 
   const [formData, setFormData] = useState<NewUseCaseData>({
     title: '',
@@ -267,7 +286,7 @@ export default function NewUseCaseModal({ onClose, onSubmit, existingUseCase = n
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as UseCaseStatus })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E30613] focus:border-transparent outline-none transition-all"
                 >
-                  {statuses.map((status) => (
+                  {getAvailableStatuses().map((status) => (
                     <option key={status} value={status}>
                       {t(`status.${status}`)}
                     </option>
