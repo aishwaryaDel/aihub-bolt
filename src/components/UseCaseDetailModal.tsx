@@ -236,13 +236,13 @@ export default function UseCaseDetailModal({
           <div className="flex gap-3">
             <button
               onClick={() => {
-                if (useCase.application_url) {
+                if (useCase.application_url && useCase.status === 'Live') {
                   window.open(useCase.application_url, '_blank');
                 }
               }}
-              disabled={!useCase.application_url}
+              disabled={!useCase.application_url || useCase.status !== 'Live'}
               className={`flex-[2] px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${
-                useCase.application_url
+                useCase.application_url && useCase.status === 'Live'
                   ? 'bg-[#E30613] text-white hover:bg-[#c00510]'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
