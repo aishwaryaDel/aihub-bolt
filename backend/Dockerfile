@@ -14,8 +14,8 @@ RUN npm install
 
 # Restlichen Code reinkopieren
 COPY src ./src
-COPY scripts ./scripts
-COPY db ./db
+# COPY scripts ./scripts
+# COPY db ./db
 
 # TypeScript nach dist/ bauen
 RUN npm run build
