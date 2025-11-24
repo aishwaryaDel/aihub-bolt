@@ -15,28 +15,10 @@ jobs:
         run: |
           echo "🚀 Backend Docker Build & Push Workflow"
           echo "Branch: ${{ github.ref }}"
+          echo "Version: v${{ github.run_number }}" 
           echo "Commit SHA: ${{ github.sha }}"
           echo "Target Environment: dev"
           echo "ACR Name: ${{ vars.ACR_NAME_DEV }}"
-
-  # trigger-common-pipeline:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Trigger Docker Backend pipeline
-  #       run: |
-  #         curl -X POST \
-  #         -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
-  #         -H "Accept: application/vnd.github.everest-preview+json" \
-  #         https://api.github.com/repos/aishwaryaDel/docker_image/dispatches \
-  #         -d '{
-  #           "event_type": "backend-update",
-  #           "client_payload": {
-  #             "environment": "dev",
-  #             "acr_name": "acrtesadevgwc", 
-  #             "image_name": "backend-dev",
-  #             "commit_sha": "${{ github.sha }}"
-  #           }
-  #         }'
 
   build-and-push:
     name: Dev
@@ -45,7 +27,8 @@ jobs:
     with:
       environment: "dev"
       image_name: "backend-dev"
-      image_tag: ${{ github.sha }}
+      # image_tag: ${{ github.sha }}
+      image_tag: v${{ github.run_number }} # Auto-increment version
       acr_name: ${{ vars.ACR_NAME_DEV }}  # ACR name from GitHub variable 
     secrets:
       azure_creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
