@@ -48,6 +48,7 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
   const [selectedStatus, setSelectedStatus] = useState<'All' | UseCaseStatus>('All');
   const [selectedUseCase, setSelectedUseCase] = useState<UseCase | null>(null);
   const [showNewUseCaseModal, setShowNewUseCaseModal] = useState(false);
+  const [useCaseToUpdate, setUseCaseToUpdate] = useState<UseCase | null>(null);
 
   const filteredUseCases = useMemo(() => {
     return useCases.filter((useCase) => {
@@ -233,10 +234,10 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
           onClose={() => setSelectedUseCase(null)}
           relatedUseCases={relatedUseCases}
           onRelatedClick={handleRelatedClick}
-          onUpdate={() => {
-            if (onRefresh) onRefresh();
-            const updated = useCases.find(uc => uc.id === selectedUseCase.id);
-            if (updated) setSelectedUseCase(updated);
+          onUpdateClick={() => {
+            setUseCaseToUpdate(selectedUseCase);
+            setShowNewUseCaseModal(true);
+            setSelectedUseCase(null);
           }}
         />
       )}
@@ -245,8 +246,10 @@ export default function UseCaseOverview({ useCases, onBackToHome, isLoading = fa
         <NewUseCaseModal
           onClose={() => {
             setShowNewUseCaseModal(false);
+            setUseCaseToUpdate(null);
           }}
           onSubmit={handleNewUseCaseSubmit}
+          existingUseCase={useCaseToUpdate}
         />
       )}
     </div>
