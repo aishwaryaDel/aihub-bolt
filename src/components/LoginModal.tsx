@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Eye, EyeOff } from 'lucide-react';
+import { X, Eye, EyeOff, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { api } from '../config';
 import bcrypt from 'bcryptjs';
@@ -146,7 +146,27 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
               {isLoading ? t('login.loggingIn') : t('login.loginButton')}
             </button>
 
-            <div className="text-center">
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-slate-500">or</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                console.log('Azure AD login clicked');
+              }}
+              className="w-full bg-slate-700 hover:bg-slate-800 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <ExternalLink size={20} />
+              Sign in with Azure AD
+            </button>
+
+            <div className="text-center mt-4">
               <button
                 type="button"
                 className="text-blue-600 hover:text-blue-700 text-sm transition-colors"
