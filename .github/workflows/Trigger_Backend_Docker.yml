@@ -16,7 +16,6 @@ jobs:
           echo "🚀 Backend Docker Build & Push Workflow"
           echo "Branch: ${{ github.ref }}"
           echo "Version: v${{ github.run_number }}" 
-          echo "Commit SHA: ${{ github.sha }}"
           echo "Target Environment: dev"
           echo "ACR Name: ${{ vars.ACR_NAME_DEV }}"
 
@@ -27,7 +26,6 @@ jobs:
     with:
       environment: "dev"
       image_name: "backend-dev"
-      # image_tag: ${{ github.sha }}
       image_tag: v${{ github.run_number }} # Auto-increment version
       acr_name: ${{ vars.ACR_NAME_DEV }}  # ACR name from GitHub variable 
     secrets:
