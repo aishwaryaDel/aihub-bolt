@@ -19,7 +19,6 @@ jobs:
         run: |
           echo "🚀 Frontend Docker Build & Push Workflow"
           echo "Branch: ${{ github.ref }}"
-          echo "Version: v${{ github.run_number }}" 
           echo "Target Environment: dev"
 
   # ---------------------- DEV ----------------------
@@ -30,7 +29,6 @@ jobs:
     with:
       environment: "dev"
       image_name: "ui-dev"
-      image_tag: v${{ github.run_number }} # Auto-increment version
       app_info: ${{ vars.APP_INFO_DEV }}  # App info from GitHub variable
     secrets:
       azure_creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
