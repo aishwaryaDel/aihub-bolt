@@ -3,7 +3,7 @@ name: App Deployment Trigger
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
   setup:
@@ -17,15 +17,15 @@ jobs:
           echo "Target Environment: dev"
 
   # ---------------------- DEV ----------------------
-  build-and-push-dev:
-    name: Dev
-    needs: setup
-    uses: aishwaryaDel/tesa-docker-build-and-push/.github/workflows/App_docker_deploy.yml@main
-    with:
-      environment: "dev"
-      image_name: "tesa-ai-app-dev"
-      image_tag: v${{ github.run_number }} # Auto-increment version
-      app_info: ${{ vars.APP_INFO_DEV }}  # App info from GitHub variable 
-    secrets:
-      azure_creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
-      docker_env: ${{ secrets.DOCKER_ENV_DEV }} 
+  # build-and-push-dev:
+  #   name: Dev
+  #   needs: setup
+  #   uses: aishwaryaDel/tesa-docker-build-and-push/.github/workflows/App_docker_deploy.yml@main
+  #   with:
+  #     environment: "dev"
+  #     image_name: "tesa-ai-app-dev"
+  #     image_tag: v${{ github.run_number }} # Auto-increment version
+  #     app_info: ${{ vars.APP_INFO_DEV }}  # App info from GitHub variable 
+  #   secrets:
+  #     azure_creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+  #     docker_env: ${{ secrets.DOCKER_ENV_DEV }} 

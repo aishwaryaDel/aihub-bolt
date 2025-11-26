@@ -42,3 +42,4 @@ EXPOSE 3001
 
 # Startkommando für die API
 CMD ["node", "dist/src/server.js"]
+

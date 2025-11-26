@@ -1,10 +1,10 @@
-name: Backend Docker Pipeline Trigger
+name: Frontend Docker Pipeline Trigger
 
 on:
   push:
     branches:
       - dev
-    paths:
+    paths-ignore:
       - 'backend/**'
 
 jobs:
@@ -13,22 +13,21 @@ jobs:
     steps:
       - name: Print Environment Details
         run: |
-          echo "🚀 Backend Docker Build & Push Workflow"
+          echo "🚀 Frontend Docker Build & Push Workflow"
           echo "Branch: ${{ github.ref }}"
           echo "Version: v${{ github.run_number }}" 
           echo "Target Environment: dev"
-          echo "ACR Name: ${{ vars.ACR_NAME_DEV }}"
 
   # ---------------------- DEV ----------------------
   build-and-push-dev:
     name: Dev
     needs: setup
-    uses: aishwaryaDel/tesa-docker-build-and-push/.github/workflows/Backend_docker_build.yml@main
+    uses: aishwaryaDel/tesa-docker-build-and-push/.github/workflows/Frontend_docker_deploy.yml@main
     with:
       environment: "dev"
-      image_name: "backend-dev"
+      image_name: "ui-dev"
       image_tag: v${{ github.run_number }} # Auto-increment version
-      acr_name: ${{ vars.ACR_NAME_DEV }}  # ACR name from GitHub variable 
+      app_info: ${{ vars.APP_INFO_DEV }}  # App info from GitHub variable
     secrets:
       azure_creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
       docker_env: ${{ secrets.DOCKER_ENV_DEV }} 

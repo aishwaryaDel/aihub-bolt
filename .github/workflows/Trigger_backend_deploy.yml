@@ -1,0 +1,33 @@
+name: Backend Docker Pipeline Trigger
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'backend/**'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Environment Details
+        run: |
+          echo "🚀 Backend Docker Build & Push Workflow"
+          echo "Branch: ${{ github.ref }}"
+          echo "Version: v${{ github.run_number }}" 
+          echo "Target Environment: dev"
+
+  # ---------------------- DEV ----------------------
+  build-and-push-dev:
+    name: Dev
+    needs: setup
+    uses: aishwaryaDel/tesa-docker-build-and-push/.github/workflows/Backend_docker_deploy.yml@main
+    with:
+      environment: "dev"
+      image_name: "api-dev"
+      image_tag: v${{ github.run_number }} # Auto-increment version
+      app_info: ${{ vars.APP_INFO_DEV }}  # App info from GitHub variable
+    secrets:
+      azure_creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+      docker_env: ${{ secrets.DOCKER_ENV_DEV }} 
