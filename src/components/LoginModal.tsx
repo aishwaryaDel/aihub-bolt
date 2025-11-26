@@ -32,14 +32,14 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
     }
 
     try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+     // const hashedPassword = await bcrypt.hash(password, 10);
 
       const response = await fetch(`${api.baseUrl}${api.endpoints.auth.login}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password: hashedPassword }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
