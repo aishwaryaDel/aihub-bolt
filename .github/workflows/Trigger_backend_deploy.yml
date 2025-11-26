@@ -4,10 +4,14 @@ on:
   push:
     branches:
       - dev
+      - main
     paths:
       - 'backend/**'
+  workflow_dispatch:
 
 jobs:
+
+  # ---------------------- SETUP ----------------------
   setup:
     runs-on: ubuntu-latest
     steps:
