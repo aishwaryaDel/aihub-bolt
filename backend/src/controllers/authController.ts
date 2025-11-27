@@ -24,7 +24,8 @@ export async function loginUser(req: Request, res: Response) {
         error: 'Invalid credentials'
       });
     }
-
+    
+ logEvent('LoginSuccess', { email });
     return res.json({
       success: true,
       data: result,
