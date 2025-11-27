@@ -4,10 +4,14 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import useCaseRoutes from './routes/useCaseRoutes';
 import userRoutes from './routes/userRoutes';
-import authRoutes from './auth'
+import authRoutes from './auth';
+import { initializeAppInsights } from './utils/appInsights';
 
 // Environment Variablen laden (.env)
 dotenv.config();
+
+// Initialize Application Insights
+initializeAppInsights();
 
 // Express App initialisieren
 const app = express();
