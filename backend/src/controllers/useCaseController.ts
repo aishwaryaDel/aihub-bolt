@@ -9,12 +9,14 @@ export class UseCaseController {
   async getAllUseCases(req: Request, res: Response): Promise<void> {
     try {
       const useCases = await useCaseService.getAllUseCases();
+       logEvent('GetAllUseCases', { count: useCases.length.toString() });
       res.status(200).json({
         success: true,
         data: useCases,
         count: useCases.length,
       });
     } catch (error) {
+      logException(error as Error, { context: 'getAllUseCases' });
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch use cases',
