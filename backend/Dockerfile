@@ -18,7 +18,7 @@ COPY migrations ./migrations
 COPY .env ./.env
 
 # Run testcases
-RUN npm run test -- --ci --runInBand
+RUN npm run test 
 # COPY db ./db
 
 # TypeScript nach dist/ bauen
