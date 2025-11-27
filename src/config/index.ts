@@ -139,7 +139,7 @@ export const ui = {
  */
 export const externalLinks = {
   sharepoint: {
-    baseUrl: 'https://sharepoint.tesa.com',
+    baseUrl: env.external.sharepoint,
   },
   confluence: {
     baseUrl: 'https://confluence.tesa.com',
