@@ -36,11 +36,11 @@ export function initializeAppInsights(): void {
 /**
  * Log a trace message
  */
-export function logTrace(message: string, severity: appInsights.Contracts.SeverityLevel = appInsights.Contracts.SeverityLevel.Information): void {
+export function logTrace(message: string, severity?: number): void {
   if (client) {
     client.trackTrace({
       message,
-      severity
+      severity: severity ?? 1
     });
   }
 }
