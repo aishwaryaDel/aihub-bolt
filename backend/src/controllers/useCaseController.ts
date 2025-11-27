@@ -29,6 +29,7 @@ export class UseCaseController {
       const { id } = req.params;
 
       if (!id) {
+        logTrace('Fetch use case failed: missing ID');
         res.status(400).json({
           success: false,
           error: 'Use case ID is required',
@@ -39,18 +40,20 @@ export class UseCaseController {
       const useCase = await useCaseService.getUseCaseById(id);
 
       if (!useCase) {
+         logEvent('UseCaseNotFound', { id });
         res.status(404).json({
           success: false,
           error: 'Use case not found',
         });
         return;
       }
-
+     logEvent('GetUseCaseById', { id });
       res.status(200).json({
         success: true,
         data: useCase,
       });
     } catch (error) {
+      logException(error as Error, { context: 'getUseCaseById' });
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch use case',
@@ -64,6 +67,7 @@ export class UseCaseController {
 
       const validationError = this.validateUseCaseData(useCaseData);
       if (validationError) {
+        logTrace('Create use case failed: validation error');
         res.status(400).json({
           success: false,
           error: validationError,
