@@ -13,6 +13,9 @@ RUN npm install
 # Restlichen Code kopieren
 COPY . .
 
+# Run Test cases
+RUN npm run test --if-present
+
 # Production Build erzeugen (Vite legt Output in /app/dist)
 RUN npm run build
 
