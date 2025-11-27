@@ -40,7 +40,7 @@ export function logTrace(message: string, severity?: number): void {
   if (client) {
     client.trackTrace({
       message,
-      severity: severity ?? 1
+      severity: (severity ?? 1) as any
     });
   }
 }
