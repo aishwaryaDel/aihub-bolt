@@ -18,8 +18,7 @@ export const env = {
     environment: import.meta.env.MODE || 'development',
   },
   api: {
-    // baseUrl: 'http://localhost:3001/api',
-    baseUrl: 'https://watesadevgwcapi.azurewebsites.net/api',
+   baseUrl: import.meta.env.VITE_API_BASE_URL,
   },
 } as const;
 
