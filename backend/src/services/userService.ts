@@ -1,45 +1,70 @@
 import { query } from '../config/database';
 import { User, CreateUserDTO, UpdateUserDTO } from '../models/User';
 import { authService } from './authService';
+import { logTrace, logException } from '../utils/appInsights';
 
 export class UserService {
   async getAllUsers(): Promise<User[]> {
-    const result = await query('SELECT id, email, name, role, created_at, updated_at FROM users ORDER BY created_at DESC');
-    return result.rows as User[];
+    try {
+      logTrace('UserService: Fetching all users');
+      const result = await query('SELECT id, email, name, role, created_at, updated_at FROM users ORDER BY created_at DESC');
+      logTrace(`UserService: Retrieved ${result.rows.length} users`);
+      return result.rows as User[];
+    } catch (error) {
+      logException(error as Error, { context: 'userService.getAllUsers' });
+      throw error;
+    }
   }
 
   async getUserById(id: string): Promise<User | null> {
-    const result = await query('SELECT id, email, name, role, created_at, updated_at FROM users WHERE id = $1', [id]);
+    try {
+      logTrace('UserService: Fetching user by ID');
+      const result = await query('SELECT id, email, name, role, created_at, updated_at FROM users WHERE id = $1', [id]);
 
-    if (result.rowCount === 0) {
-      return null;
+      if (result.rowCount === 0) {
+        logTrace('UserService: User not found');
+        return null;
+      }
+
+      logTrace('UserService: User retrieved');
+      return result.rows[0] as User;
+    } catch (error) {
+      logException(error as Error, { context: 'userService.getUserById' });
+      throw error;
     }
-
-    return result.rows[0] as User;
   }
 
   async createUser(userData: CreateUserDTO): Promise<User> {
-    const { email, password, name, role } = userData;
+    try {
+      logTrace('UserService: Creating new user');
+      const { email, password, name, role } = userData;
 
-    const hashedPassword = await authService.hashPassword(password);
+      const hashedPassword = await authService.hashPassword(password);
 
-    const result = await query(
-      `INSERT INTO users (
-        email, password, name, role, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, NOW(), NOW())
-      RETURNING id, email, name, role, created_at, updated_at`,
-      [email, hashedPassword, name, role]
-    );
+      const result = await query(
+        `INSERT INTO users (
+          email, password, name, role, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, NOW(), NOW())
+        RETURNING id, email, name, role, created_at, updated_at`,
+        [email, hashedPassword, name, role]
+      );
 
-    return result.rows[0] as User;
+      logTrace('UserService: User created successfully');
+      return result.rows[0] as User;
+    } catch (error) {
+      logException(error as Error, { context: 'userService.createUser' });
+      throw error;
+    }
   }
 
   async updateUser(id: string, updates: UpdateUserDTO): Promise<User | null> {
-    const fields: string[] = [];
-    const values: any[] = [];
-    let paramIndex = 1;
+    try {
+      logTrace('UserService: Updating user');
+      const fields: string[] = [];
+      const values: any[] = [];
+      let paramIndex = 1;
 
-    if (updates.email !== undefined) {
+      if (updates.email !== undefined) {
       fields.push(`email = $${paramIndex++}`);
       values.push(updates.email);
     }
@@ -71,15 +96,29 @@ export class UserService {
     );
 
     if (result.rowCount === 0) {
+      logTrace('UserService: User not found for update');
       return null;
     }
 
+    logTrace('UserService: User updated successfully');
     return result.rows[0] as User;
+    } catch (error) {
+      logException(error as Error, { context: 'userService.updateUser' });
+      throw error;
+    }
   }
 
   async deleteUser(id: string): Promise<boolean> {
-    const result = await query('DELETE FROM users WHERE id = $1', [id]);
-    return result.rowCount !== null && result.rowCount > 0;
+    try {
+      logTrace('UserService: Deleting user');
+      const result = await query('DELETE FROM users WHERE id = $1', [id]);
+      const success = result.rowCount !== null && result.rowCount > 0;
+      logTrace(`UserService: User deletion ${success ? 'successful' : 'failed'}`);
+      return success;
+    } catch (error) {
+      logException(error as Error, { context: 'userService.deleteUser' });
+      throw error;
+    }
   }
 }
 

@@ -5,13 +5,14 @@ import dotenv from 'dotenv';
 import useCaseRoutes from './routes/useCaseRoutes';
 import userRoutes from './routes/userRoutes';
 import authRoutes from './auth';
-import { initializeAppInsights } from './utils/appInsights';
+import { initializeAppInsights, logTrace, logEvent } from './utils/appInsights';
 
 // Environment Variablen laden (.env)
 dotenv.config();
 
 // Initialize Application Insights
 initializeAppInsights();
+logTrace('Server initialization started');
 
 // Express App initialisieren
 const app = express();
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes);
 
 // Health Check Endpoint
 app.get('/', (req, res) => {
+  logTrace('Health check endpoint accessed');
   res.send('Tesa AI Hub Backend is running 🚀');
 });
 
@@ -35,4 +37,6 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`✅ Server läuft auf Port ${PORT}`);
+  logEvent('ServerStarted', { port: PORT.toString() });
+  logTrace(`Server successfully started on port ${PORT}`);
 });
