@@ -149,8 +149,8 @@ export const externalLinks = {
     rolesRequestPath: '/roles/request',
   },
   support: {
-    email: 'ai-team@tesa.com',
-    portal: 'https://support.tesa.com/ai-hub',
+    email: env.external.supportEmail,
+    portal: env.external.supportPortal,
   },
 } as const;
 
