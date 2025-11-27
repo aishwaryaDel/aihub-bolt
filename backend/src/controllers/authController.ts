@@ -31,6 +31,7 @@ export async function loginUser(req: Request, res: Response) {
       data: result,
     });
   } catch (err) {
+    logException(err as Error, { context: 'loginUser' });
     console.error('Login error:', err);
     return res.status(500).json({
       success: false,
