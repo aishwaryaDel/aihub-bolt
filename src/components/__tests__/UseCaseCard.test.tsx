@@ -2,9 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import UseCaseCard from '../UseCaseCard';
-import { LanguageProvider } from '../../contexts/LanguageContext';
+import { UseCase } from '../../types';
 
-const mockUseCase = {
+const mockUseCase: UseCase = {
   id: '1',
   title: 'Test Use Case',
   short_description: 'This is a test use case description',
@@ -30,11 +30,7 @@ describe('UseCaseCard', () => {
   it('should render use case information', () => {
     const onClick = vi.fn();
 
-    render(
-      <LanguageProvider>
-        <UseCaseCard useCase={mockUseCase} onClick={onClick} />
-      </LanguageProvider>
-    );
+    render(<UseCaseCard useCase={mockUseCase} onClick={onClick} />);
 
     expect(screen.getByText('Test Use Case')).toBeInTheDocument();
     expect(screen.getByText('This is a test use case description')).toBeInTheDocument();
@@ -42,28 +38,18 @@ describe('UseCaseCard', () => {
     expect(screen.getByText('Live')).toBeInTheDocument();
   });
 
-  it('should display technology stack', () => {
+  it('should display owner information', () => {
     const onClick = vi.fn();
 
-    render(
-      <LanguageProvider>
-        <UseCaseCard useCase={mockUseCase} onClick={onClick} />
-      </LanguageProvider>
-    );
+    render(<UseCaseCard useCase={mockUseCase} onClick={onClick} />);
 
-    expect(screen.getByText('React')).toBeInTheDocument();
-    expect(screen.getByText('Node.js')).toBeInTheDocument();
-    expect(screen.getByText('PostgreSQL')).toBeInTheDocument();
+    expect(screen.getByText(/By John Doe/)).toBeInTheDocument();
   });
 
   it('should display tags', () => {
     const onClick = vi.fn();
 
-    render(
-      <LanguageProvider>
-        <UseCaseCard useCase={mockUseCase} onClick={onClick} />
-      </LanguageProvider>
-    );
+    render(<UseCaseCard useCase={mockUseCase} onClick={onClick} />);
 
     expect(screen.getByText('#ai')).toBeInTheDocument();
     expect(screen.getByText('#automation')).toBeInTheDocument();
@@ -74,48 +60,73 @@ describe('UseCaseCard', () => {
     const user = userEvent.setup();
     const onClick = vi.fn();
 
-    render(
-      <LanguageProvider>
-        <UseCaseCard useCase={mockUseCase} onClick={onClick} />
-      </LanguageProvider>
-    );
+    render(<UseCaseCard useCase={mockUseCase} onClick={onClick} />);
 
-    const card = screen.getByText('Test Use Case').closest('div[class*="cursor-pointer"]');
-    if (card) {
-      await user.click(card);
-      expect(onClick).toHaveBeenCalledTimes(1);
-    }
+    const card = screen.getByRole('button');
+    await user.click(card);
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('should call onClick when Enter key is pressed', async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+
+    render(<UseCaseCard useCase={mockUseCase} onClick={onClick} />);
+
+    const card = screen.getByRole('button');
+    card.focus();
+    await user.keyboard('{Enter}');
+
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it('should render different status colors', () => {
     const onClick = vi.fn();
-    const useCaseWithDifferentStatus = {
+    const useCaseWithDifferentStatus: UseCase = {
       ...mockUseCase,
       status: 'PoC',
     };
 
-    render(
-      <LanguageProvider>
-        <UseCaseCard useCase={useCaseWithDifferentStatus} onClick={onClick} />
-      </LanguageProvider>
-    );
+    render(<UseCaseCard useCase={useCaseWithDifferentStatus} onClick={onClick} />);
 
     expect(screen.getByText('PoC')).toBeInTheDocument();
   });
 
   it('should handle use case without application URL', () => {
     const onClick = vi.fn();
-    const useCaseWithoutUrl = {
+    const useCaseWithoutUrl: UseCase = {
       ...mockUseCase,
       application_url: null,
     };
 
-    render(
-      <LanguageProvider>
-        <UseCaseCard useCase={useCaseWithoutUrl} onClick={onClick} />
-      </LanguageProvider>
-    );
+    render(<UseCaseCard useCase={useCaseWithoutUrl} onClick={onClick} />);
 
     expect(screen.getByText('Test Use Case')).toBeInTheDocument();
+  });
+
+  it('should display only first 3 tags when more are available', () => {
+    const onClick = vi.fn();
+    const useCaseWithManyTags: UseCase = {
+      ...mockUseCase,
+      tags: ['ai', 'automation', 'ml', 'analytics', 'chatbot'],
+    };
+
+    render(<UseCaseCard useCase={useCaseWithManyTags} onClick={onClick} />);
+
+    expect(screen.getByText('#ai')).toBeInTheDocument();
+    expect(screen.getByText('#automation')).toBeInTheDocument();
+    expect(screen.getByText('#ml')).toBeInTheDocument();
+    expect(screen.queryByText('#analytics')).not.toBeInTheDocument();
+    expect(screen.queryByText('#chatbot')).not.toBeInTheDocument();
+  });
+
+  it('should render image with proper alt text', () => {
+    const onClick = vi.fn();
+
+    render(<UseCaseCard useCase={mockUseCase} onClick={onClick} />);
+
+    const image = screen.getByAltText('Test Use Case');
+    expect(image).toBeInTheDocument();
   });
 });

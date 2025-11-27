@@ -16,18 +16,18 @@ describe('LanguageSwitcher', () => {
     expect(screen.getByText('DE')).toBeInTheDocument();
   });
 
-  it('should highlight active language', () => {
+  it('should highlight German as active by default', () => {
     render(
       <LanguageProvider>
         <LanguageSwitcher />
       </LanguageProvider>
     );
 
-    const enButton = screen.getByText('EN');
-    expect(enButton.className).toContain('bg-blue-600');
+    const deButton = screen.getByText('DE');
+    expect(deButton).toHaveClass('bg-[#E30613]', 'text-white');
   });
 
-  it('should switch to German when DE is clicked', async () => {
+  it('should switch to English when EN is clicked', async () => {
     const user = userEvent.setup();
 
     render(
@@ -36,10 +36,10 @@ describe('LanguageSwitcher', () => {
       </LanguageProvider>
     );
 
-    const deButton = screen.getByText('DE');
-    await user.click(deButton);
+    const enButton = screen.getByText('EN');
+    await user.click(enButton);
 
-    expect(deButton.className).toContain('bg-blue-600');
+    expect(enButton).toHaveClass('bg-[#E30613]', 'text-white');
   });
 
   it('should switch between languages', async () => {
@@ -54,10 +54,23 @@ describe('LanguageSwitcher', () => {
     const deButton = screen.getByText('DE');
     const enButton = screen.getByText('EN');
 
-    await user.click(deButton);
-    expect(deButton.className).toContain('bg-blue-600');
+    expect(deButton).toHaveClass('bg-[#E30613]');
 
     await user.click(enButton);
-    expect(enButton.className).toContain('bg-blue-600');
+    expect(enButton).toHaveClass('bg-[#E30613]', 'text-white');
+
+    await user.click(deButton);
+    expect(deButton).toHaveClass('bg-[#E30613]', 'text-white');
+  });
+
+  it('should have proper styling container', () => {
+    const { container } = render(
+      <LanguageProvider>
+        <LanguageSwitcher />
+      </LanguageProvider>
+    );
+
+    const switcherContainer = container.firstChild;
+    expect(switcherContainer).toHaveClass('flex', 'items-center', 'gap-2');
   });
 });
