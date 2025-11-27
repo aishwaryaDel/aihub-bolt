@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { useCaseService } from '../services/useCaseService';
 import { CreateUseCaseDTO, UpdateUseCaseDTO } from '../models/UseCase';
-
+import { logTrace, logEvent, logException } from '../utils/appInsights';
 const VALID_STATUSES = ['Ideation', 'Pre-Evaluation', 'Evaluation', 'PoC', 'MVP', 'Live', 'Archived'];
 const VALID_DEPARTMENTS = ['Marketing', 'R&D', 'Procurement', 'IT', 'HR', 'Operations'];
 
@@ -9,12 +9,14 @@ export class UseCaseController {
   async getAllUseCases(req: Request, res: Response): Promise<void> {
     try {
       const useCases = await useCaseService.getAllUseCases();
+       logEvent('GetAllUseCases', { count: useCases.length.toString() });
       res.status(200).json({
         success: true,
         data: useCases,
         count: useCases.length,
       });
     } catch (error) {
+      logException(error as Error, { context: 'getAllUseCases' });
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch use cases',
@@ -27,6 +29,7 @@ export class UseCaseController {
       const { id } = req.params;
 
       if (!id) {
+        logTrace('Fetch use case failed: missing ID');
         res.status(400).json({
           success: false,
           error: 'Use case ID is required',
@@ -37,18 +40,20 @@ export class UseCaseController {
       const useCase = await useCaseService.getUseCaseById(id);
 
       if (!useCase) {
+         logEvent('UseCaseNotFound', { id });
         res.status(404).json({
           success: false,
           error: 'Use case not found',
         });
         return;
       }
-
+     logEvent('GetUseCaseById', { id });
       res.status(200).json({
         success: true,
         data: useCase,
       });
     } catch (error) {
+      logException(error as Error, { context: 'getUseCaseById' });
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch use case',
@@ -58,10 +63,12 @@ export class UseCaseController {
 
   async createUseCase(req: Request, res: Response): Promise<void> {
     try {
+      logTrace('Starting createUseCase');
       const useCaseData: CreateUseCaseDTO = req.body;
 
       const validationError = this.validateUseCaseData(useCaseData);
       if (validationError) {
+        logTrace('Create use case failed: validation error');
         res.status(400).json({
           success: false,
           error: validationError,
@@ -70,6 +77,7 @@ export class UseCaseController {
       }
 
       const newUseCase = await useCaseService.createUseCase(useCaseData);
+      logEvent('UseCaseCreated', { id: newUseCase.id, title: useCaseData.title });
 
       res.status(201).json({
         success: true,
@@ -77,6 +85,7 @@ export class UseCaseController {
         message: 'Use case created successfully',
       });
     } catch (error) {
+      logException(error as Error, { context: 'createUseCase' });
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create use case',
@@ -86,10 +95,12 @@ export class UseCaseController {
 
   async updateUseCase(req: Request, res: Response): Promise<void> {
     try {
+      logTrace('Starting updateUseCase');
       const { id } = req.params;
       const updates: UpdateUseCaseDTO = req.body;
 
       if (!id) {
+        logTrace('Update use case failed: missing ID');
         res.status(400).json({
           success: false,
           error: 'Use case ID is required',
@@ -98,6 +109,7 @@ export class UseCaseController {
       }
 
       if (Object.keys(updates).length === 0) {
+        logTrace('Update use case failed: no data provided');
         res.status(400).json({
           success: false,
           error: 'No update data provided',
@@ -107,6 +119,7 @@ export class UseCaseController {
 
       const validationError = this.validateUpdateData(updates);
       if (validationError) {
+        logTrace('Update use case failed: validation error');
         res.status(400).json({
           success: false,
           error: validationError,
@@ -117,6 +130,7 @@ export class UseCaseController {
       const updatedUseCase = await useCaseService.updateUseCase(id, updates);
 
       if (!updatedUseCase) {
+        logEvent('UseCaseNotFound', { id });
         res.status(404).json({
           success: false,
           error: 'Use case not found',
@@ -124,12 +138,14 @@ export class UseCaseController {
         return;
       }
 
+      logEvent('UseCaseUpdated', { id });
       res.status(200).json({
         success: true,
         data: updatedUseCase,
         message: 'Use case updated successfully',
       });
     } catch (error) {
+      logException(error as Error, { context: 'updateUseCase' });
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to update use case',
@@ -139,9 +155,11 @@ export class UseCaseController {
 
   async deleteUseCase(req: Request, res: Response): Promise<void> {
     try {
+      logTrace('Starting deleteUseCase');
       const { id } = req.params;
 
       if (!id) {
+        logTrace('Delete use case failed: missing ID');
         res.status(400).json({
           success: false,
           error: 'Use case ID is required',
@@ -151,6 +169,7 @@ export class UseCaseController {
 
       const useCase = await useCaseService.getUseCaseById(id);
       if (!useCase) {
+        logEvent('UseCaseNotFound', { id });
         res.status(404).json({
           success: false,
           error: 'Use case not found',
@@ -159,12 +178,14 @@ export class UseCaseController {
       }
 
       await useCaseService.deleteUseCase(id);
+      logEvent('UseCaseDeleted', { id });
 
       res.status(200).json({
         success: true,
         message: 'Use case deleted successfully',
       });
     } catch (error) {
+      logException(error as Error, { context: 'deleteUseCase' });
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to delete use case',

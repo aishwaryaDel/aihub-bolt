@@ -1,47 +1,42 @@
 import { query } from '../config/database';
 import { UseCase, CreateUseCaseDTO, UpdateUseCaseDTO } from '../models/UseCase';
+import { logTrace, logException } from '../utils/appInsights';
 
 export class UseCaseService {
   async getAllUseCases(): Promise<UseCase[]> {
-    const result = await query('SELECT * FROM use_cases ORDER BY created_at DESC');
-    return result.rows as UseCase[];
+    try {
+      logTrace('UseCaseService: Fetching all use cases');
+      const result = await query('SELECT * FROM use_cases ORDER BY created_at DESC');
+      logTrace(`UseCaseService: Retrieved ${result.rows.length} use cases`);
+      return result.rows as UseCase[];
+    } catch (error) {
+      logException(error as Error, { context: 'useCaseService.getAllUseCases' });
+      throw error;
+    }
   }
 
   async getUseCaseById(id: string): Promise<UseCase | null> {
-    const result = await query('SELECT * FROM use_cases WHERE id = $1', [id]);
+    try {
+      logTrace('UseCaseService: Fetching use case by ID');
+      const result = await query('SELECT * FROM use_cases WHERE id = $1', [id]);
 
-    if (result.rowCount === 0) {
-      return null;
+      if (result.rowCount === 0) {
+        logTrace('UseCaseService: Use case not found');
+        return null;
+      }
+
+      logTrace('UseCaseService: Use case retrieved');
+      return result.rows[0] as UseCase;
+    } catch (error) {
+      logException(error as Error, { context: 'useCaseService.getUseCaseById' });
+      throw error;
     }
-
-    return result.rows[0] as UseCase;
   }
 
   async createUseCase(useCaseData: CreateUseCaseDTO): Promise<UseCase> {
-    const {
-      title,
-      short_description,
-      full_description,
-      department,
-      status,
-      owner_name,
-      owner_email,
-      business_impact,
-      technology_stack,
-      internal_links,
-      tags,
-      related_use_case_ids,
-      application_url,
-    } = useCaseData;
-
-    const result = await query(
-      `INSERT INTO use_cases (
-        title, short_description, full_description, department, status,
-        owner_name, owner_email, business_impact, technology_stack,
-        internal_links, tags, related_use_case_ids, application_url, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
-      RETURNING *`,
-      [
+    try {
+      logTrace('UseCaseService: Creating new use case');
+      const {
         title,
         short_description,
         full_description,
@@ -49,24 +44,54 @@ export class UseCaseService {
         status,
         owner_name,
         owner_email,
-        business_impact || null,
-        JSON.stringify(technology_stack),
-        JSON.stringify(internal_links),
-        JSON.stringify(tags),
-        JSON.stringify(related_use_case_ids || []),
-        application_url || null,
-      ]
-    );
+        business_impact,
+        technology_stack,
+        internal_links,
+        tags,
+        related_use_case_ids,
+        application_url,
+      } = useCaseData;
 
-    return result.rows[0] as UseCase;
+      const result = await query(
+        `INSERT INTO use_cases (
+          title, short_description, full_description, department, status,
+          owner_name, owner_email, business_impact, technology_stack,
+          internal_links, tags, related_use_case_ids, application_url, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
+        RETURNING *`,
+        [
+          title,
+          short_description,
+          full_description,
+          department,
+          status,
+          owner_name,
+          owner_email,
+          business_impact || null,
+          JSON.stringify(technology_stack),
+          JSON.stringify(internal_links),
+          JSON.stringify(tags),
+          JSON.stringify(related_use_case_ids || []),
+          application_url || null,
+        ]
+      );
+
+      logTrace('UseCaseService: Use case created successfully');
+      return result.rows[0] as UseCase;
+    } catch (error) {
+      logException(error as Error, { context: 'useCaseService.createUseCase' });
+      throw error;
+    }
   }
 
   async updateUseCase(id: string, updates: UpdateUseCaseDTO): Promise<UseCase | null> {
-    const fields: string[] = [];
-    const values: any[] = [];
-    let paramIndex = 1;
+    try {
+      logTrace('UseCaseService: Updating use case');
+      const fields: string[] = [];
+      const values: any[] = [];
+      let paramIndex = 1;
 
-    if (updates.title !== undefined) {
+      if (updates.title !== undefined) {
       fields.push(`title = $${paramIndex++}`);
       values.push(updates.title);
     }
@@ -134,15 +159,29 @@ export class UseCaseService {
     );
 
     if (result.rowCount === 0) {
+      logTrace('UseCaseService: Use case not found for update');
       return null;
     }
 
+    logTrace('UseCaseService: Use case updated successfully');
     return result.rows[0] as UseCase;
+    } catch (error) {
+      logException(error as Error, { context: 'useCaseService.updateUseCase' });
+      throw error;
+    }
   }
 
   async deleteUseCase(id: string): Promise<boolean> {
-    const result = await query('DELETE FROM use_cases WHERE id = $1', [id]);
-    return result.rowCount !== null && result.rowCount > 0;
+    try {
+      logTrace('UseCaseService: Deleting use case');
+      const result = await query('DELETE FROM use_cases WHERE id = $1', [id]);
+      const success = result.rowCount !== null && result.rowCount > 0;
+      logTrace(`UseCaseService: Use case deletion ${success ? 'successful' : 'failed'}`);
+      return success;
+    } catch (error) {
+      logException(error as Error, { context: 'useCaseService.deleteUseCase' });
+      throw error;
+    }
   }
 }
 
