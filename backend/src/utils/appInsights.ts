@@ -36,14 +36,13 @@ export function initializeAppInsights(): void {
 /**
  * Log a trace message
  */
-export function logTrace(message: string, severity?: number): void {
+export function logTrace(message: string, severity?: string): void {
   if (client) {
-    // Use Application Insights Contracts.SeverityLevel enum for severityLevel
-    // Default to Information if not provided
-    const severityLevel = typeof severity === 'number' ? severity : appInsights.Contracts.SeverityLevel.Information;
     client.trackTrace({
       message,
-      severityLevel
+     properties: {
+        severity: severity ?? "Information"
+      }
     });
   }
 }
