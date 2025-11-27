@@ -12,11 +12,6 @@
  * All environment variables are loaded from .env file and validated here
  */
 export const env = {
-  app: {
-    name: 'Tesa AI Hub',
-    version: '1.0.0',
-    environment: import.meta.env.MODE || 'development',
-  },
   api: {
    baseUrl: import.meta.env.VITE_API_BASE_URL,
   },
