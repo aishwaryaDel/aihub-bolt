@@ -25,7 +25,7 @@ jobs:
   build-and-push-dev:
     name: Dev
     needs: setup
-    uses: aishwaryaDel/tesa-docker-build-and-push/.github/workflows/Frontend_docker_deploy.yml@main
+    uses: aishwaryaDel/tesa-app-deploy/.github/workflows/Frontend_docker_deploy.yml@main
     with:
       environment: "dev"
       image_name: "ui-dev"

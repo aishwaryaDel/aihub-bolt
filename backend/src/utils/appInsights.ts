@@ -36,11 +36,13 @@ export function initializeAppInsights(): void {
 /**
  * Log a trace message
  */
-export function logTrace(message: string, severity?: number): void {
+export function logTrace(message: string, severity?: string): void {
   if (client) {
     client.trackTrace({
       message,
-      severity: (severity ?? 1) as any
+     properties: {
+        severity: severity ?? "Information"
+      }
     });
   }
 }
