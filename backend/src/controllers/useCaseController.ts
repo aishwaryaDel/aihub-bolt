@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { useCaseService } from '../services/useCaseService';
 import { CreateUseCaseDTO, UpdateUseCaseDTO } from '../models/UseCase';
-
+import { logTrace, logEvent, logException } from '../utils/appInsights';
 const VALID_STATUSES = ['Ideation', 'Pre-Evaluation', 'Evaluation', 'PoC', 'MVP', 'Live', 'Archived'];
 const VALID_DEPARTMENTS = ['Marketing', 'R&D', 'Procurement', 'IT', 'HR', 'Operations'];
 
