@@ -12,14 +12,15 @@
  * All environment variables are loaded from .env file and validated here
  */
 export const env = {
-  app: {
-    name: 'Tesa AI Hub',
-    version: '1.0.0',
-    environment: import.meta.env.MODE || 'development',
-  },
   api: {
-    // baseUrl: 'http://localhost:3001/api',
-    baseUrl: 'https://watesadevgwcapi.azurewebsites.net/api',
+   baseUrl: import.meta.env.VITE_API_BASE_URL,
+  },
+   external: {
+    sharepoint: import.meta.env.VITE_SHAREPOINT_URL,
+    confluence: import.meta.env.VITE_CONFLUENCE_URL,
+    bits: import.meta.env.VITE_BITS_URL,
+    supportPortal: import.meta.env.VITE_SUPPORT_PORTAL,
+    supportEmail: import.meta.env.VITE_SUPPORT_EMAIL,
   },
 } as const;
 
@@ -138,18 +139,18 @@ export const ui = {
  */
 export const externalLinks = {
   sharepoint: {
-    baseUrl: 'https://sharepoint.tesa.com',
+    baseUrl: env.external.sharepoint,
   },
   confluence: {
-    baseUrl: 'https://confluence.tesa.com',
+    baseUrl: env.external.confluence,
   },
   bits: {
-    baseUrl: 'https://bits.tesa.com',
+    baseUrl: env.external.bits,
     rolesRequestPath: '/roles/request',
   },
   support: {
-    email: 'ai-team@tesa.com',
-    portal: 'https://support.tesa.com/ai-hub',
+    email: env.external.supportEmail,
+    portal: env.external.supportPortal,
   },
 } as const;
 
