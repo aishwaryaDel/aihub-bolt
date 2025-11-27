@@ -16,6 +16,9 @@ RUN npm install
 COPY src ./src
 COPY migrations ./migrations
 COPY .env ./.env
+
+# Run testcases
+RUN npm run test -- --ci --runInBand
 # COPY db ./db
 
 # TypeScript nach dist/ bauen
