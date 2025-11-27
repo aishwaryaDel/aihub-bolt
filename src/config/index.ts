@@ -142,10 +142,10 @@ export const externalLinks = {
     baseUrl: env.external.sharepoint,
   },
   confluence: {
-    baseUrl: 'https://confluence.tesa.com',
+    baseUrl: env.external.confluence,
   },
   bits: {
-    baseUrl: 'https://bits.tesa.com',
+    baseUrl: env.external.bits,
     rolesRequestPath: '/roles/request',
   },
   support: {
