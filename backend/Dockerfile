@@ -16,6 +16,9 @@ RUN npm install
 COPY src ./src
 COPY migrations ./migrations
 COPY .env ./.env
+
+# Run testcases
+RUN npm run test 
 # COPY db ./db
 
 # TypeScript nach dist/ bauen
@@ -43,4 +46,3 @@ EXPOSE 3001
 
 # Startkommando für die API
 CMD ["node", "dist/src/server.js"]
-
