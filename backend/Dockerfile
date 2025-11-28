@@ -8,6 +8,7 @@ WORKDIR /app
 # package.json + tsconfig.json kopieren (reicht für npm install)
 COPY package.json ./
 COPY tsconfig.json ./
+COPY jest.config.js ./
 
 # Dependencies installieren (inkl. Dev-Dependencies, weil wir hier noch builden müssen)
 RUN npm install
@@ -18,7 +19,7 @@ COPY migrations ./migrations
 COPY .env ./.env
 
 # Run testcases
-RUN npm run test 
+RUN npm run test
 # COPY db ./db
 
 # TypeScript nach dist/ bauen
