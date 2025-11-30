@@ -165,6 +165,8 @@ export const messages = {
     loadUseCases: 'Failed to load use cases',
     saveUseCase: 'Failed to save use case',
     errorLoadingUseCases: 'Error loading use cases',
+    deleteUseCase: 'Failed to delete use case',
+    loginFailed: 'Login failed',
   },
   loading: {
     useCases: 'Loading use cases...',

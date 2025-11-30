@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { X, Eye, EyeOff, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { api } from '../config';
-import bcrypt from 'bcryptjs';
+import { authApi } from '../services/api';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -32,30 +31,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
     }
 
     try {
-     // const hashedPassword = await bcrypt.hash(password, 10);
-
-      const response = await fetch(`${api.baseUrl}${api.endpoints.auth.login}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || t('login.loginFailed'));
-        setIsLoading(false);
-        return;
-      }
-
-      if (data.success) {
-        onLoginSuccess(data.data.token, data.data.user);
-        onClose();
-      }
+      const data = await authApi.login({ email, password });
+      onLoginSuccess(data.token, data.user);
+      onClose();
     } catch (err) {
-      setError(t('login.connectionFailed'));
+      setError(err instanceof Error ? err.message : t('login.connectionFailed'));
+    } finally {
       setIsLoading(false);
     }
   };

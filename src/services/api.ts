@@ -1,3 +1,4 @@
+import axios, { AxiosInstance, AxiosError } from 'axios';
 import { UseCase, CreateUseCaseDTO, UpdateUseCaseDTO } from '../types';
 import { api, messages } from '../config';
 
@@ -24,116 +25,129 @@ interface AuthResponse {
   };
 }
 
-class UseCaseApiService {
-  private async fetchWithErrorHandling<T>(
-    url: string,
-    options?: RequestInit
-  ): Promise<T> {
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options?.headers,
-        },
-      });
+class ApiClient {
+  private client: AxiosInstance;
 
-      const data: ApiResponse<T> = await response.json();
+  constructor() {
+    this.client = axios.create({
+      baseURL: api.baseUrl,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || messages.errors.http(response.status));
+    this.client.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
       }
+    );
 
-      return data.data as T;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw error;
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error: AxiosError<ApiResponse<unknown>>) => {
+        if (error.response?.data?.error) {
+          throw new Error(error.response.data.error);
+        } else if (error.response?.status) {
+          throw new Error(messages.errors.http(error.response.status));
+        } else {
+          throw new Error(messages.errors.unexpected);
+        }
       }
-      throw new Error(messages.errors.unexpected);
-    }
+    );
   }
 
+  getInstance(): AxiosInstance {
+    return this.client;
+  }
+}
+
+const apiClient = new ApiClient();
+const axiosInstance = apiClient.getInstance();
+
+class UseCaseApiService {
   async getAllUseCases(): Promise<UseCase[]> {
-    return this.fetchWithErrorHandling<UseCase[]>(
-      `${api.baseUrl}${api.endpoints.useCases}`
+    const response = await axiosInstance.get<ApiResponse<UseCase[]>>(
+      api.endpoints.useCases
     );
+
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || messages.errors.loadUseCases);
+    }
+
+    return response.data.data;
   }
 
   async getUseCaseById(id: string): Promise<UseCase> {
-    return this.fetchWithErrorHandling<UseCase>(
-      `${api.baseUrl}${api.endpoints.useCaseById(id)}`
+    const response = await axiosInstance.get<ApiResponse<UseCase>>(
+      api.endpoints.useCaseById(id)
     );
+
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || messages.errors.loadUseCases);
+    }
+
+    return response.data.data;
   }
 
   async createUseCase(useCaseData: CreateUseCaseDTO): Promise<UseCase> {
-    return this.fetchWithErrorHandling<UseCase>(
-      `${api.baseUrl}${api.endpoints.useCases}`,
-      {
-        method: 'POST',
-        body: JSON.stringify(useCaseData),
-      }
+    const response = await axiosInstance.post<ApiResponse<UseCase>>(
+      api.endpoints.useCases,
+      useCaseData
     );
+
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || messages.errors.saveUseCase);
+    }
+
+    return response.data.data;
   }
 
   async updateUseCase(id: string, updates: UpdateUseCaseDTO): Promise<UseCase> {
-    return this.fetchWithErrorHandling<UseCase>(
-      `${api.baseUrl}${api.endpoints.useCaseById(id)}`,
-      {
-        method: 'PUT',
-        body: JSON.stringify(updates),
-      }
+    const response = await axiosInstance.put<ApiResponse<UseCase>>(
+      api.endpoints.useCaseById(id),
+      updates
     );
+
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || messages.errors.saveUseCase);
+    }
+
+    return response.data.data;
   }
 
   async deleteUseCase(id: string): Promise<void> {
-    await this.fetchWithErrorHandling<void>(
-      `${api.baseUrl}${api.endpoints.useCaseById(id)}`,
-      {
-        method: 'DELETE',
-      }
+    const response = await axiosInstance.delete<ApiResponse<void>>(
+      api.endpoints.useCaseById(id)
     );
+
+    if (!response.data.success) {
+      throw new Error(response.data.error || messages.errors.deleteUseCase);
+    }
   }
 }
 
 class AuthApiService {
-  private async fetchWithErrorHandling<T>(
-    url: string,
-    options?: RequestInit
-  ): Promise<T> {
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options?.headers,
-        },
-      });
-
-      const data: ApiResponse<T> = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || messages.errors.http(response.status));
-      }
-
-      return data.data as T;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error(messages.errors.unexpected);
-    }
-  }
-
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    return this.fetchWithErrorHandling<AuthResponse>(
-      `${api.baseUrl}${api.endpoints.auth.login}`,
-      {
-        method: 'POST',
-        body: JSON.stringify(credentials),
-      }
+    const response = await axiosInstance.post<ApiResponse<AuthResponse>>(
+      api.endpoints.auth.login,
+      credentials
     );
+
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || messages.errors.loginFailed);
+    }
+
+    return response.data.data;
   }
 }
 
 export const useCaseApi = new UseCaseApiService();
 export const authApi = new AuthApiService();
+export { axiosInstance };

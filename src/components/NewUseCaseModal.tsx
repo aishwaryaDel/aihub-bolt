@@ -85,11 +85,11 @@ export default function NewUseCaseModal({ onClose, onSubmit, existingUseCase = n
         status: existingUseCase.status,
         owner_name: existingUseCase.owner_name,
         owner_email: existingUseCase.owner_email,
-        business_impact: existingUseCase.business_impact,
+        business_impact: existingUseCase.business_impact ?? '',
         technology_stack: existingUseCase.technology_stack,
         tags: existingUseCase.tags,
-        application_url: existingUseCase.application_url || '',
-        internal_links: existingUseCase.internal_links || {}
+        application_url: existingUseCase.application_url ?? '',
+        internal_links: existingUseCase.internal_links ?? {}
       });
     }
   }, [existingUseCase]);

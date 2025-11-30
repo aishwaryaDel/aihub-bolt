@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import LandingPage from './components/LandingPage';
-import UseCaseOverview from './components/UseCaseOverview';
-import LoginModal from './components/LoginModal';
-import { LanguageProvider } from './contexts/LanguageContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { UseCase } from './types';
-import { useCaseApi } from './services/api';
-import { messages } from './config';
+import LandingPage from './LandingPage';
+import UseCaseOverview from './UseCaseOverview';
+import LoginModal from '../components/LoginModal';
+import { LanguageProvider } from '../contexts/LanguageContext';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { UseCase } from '../types';
+import { useCaseApi } from '../services/api';
+import { messages } from '../config';
 
 type Screen = 'landing' | 'overview';
 

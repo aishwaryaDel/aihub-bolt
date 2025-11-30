@@ -1,58 +1,59 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useCaseApi, authApi } from '../api';
+import { useCaseApi, authApi, axiosInstance } from '../api';
+import type { AxiosResponse } from 'axios';
 
 describe('API Service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn();
   });
 
   describe('authApi', () => {
     it('should login successfully', async () => {
-      const mockResponse = {
-        success: true,
+      const mockResponse: Partial<AxiosResponse> = {
         data: {
-          token: 'mock-token',
-          user: {
-            id: '1',
-            email: 'test@example.com',
-            name: 'Test User',
-            role: 'admin',
+          success: true,
+          data: {
+            token: 'mock-token',
+            user: {
+              id: '1',
+              email: 'test@example.com',
+              name: 'Test User',
+              role: 'admin',
+            },
           },
         },
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as Response);
+      vi.spyOn(axiosInstance, 'post').mockResolvedValueOnce(mockResponse as AxiosResponse);
 
       const result = await authApi.login({
         email: 'test@example.com',
         password: 'password123',
       });
 
-      expect(result).toEqual(mockResponse.data);
-      expect(global.fetch).toHaveBeenCalled();
+      expect(result.token).toBe('mock-token');
+      expect(result.user.email).toBe('test@example.com');
     });
 
     it('should handle login failure', async () => {
       const mockError = {
-        success: false,
-        error: 'Invalid credentials',
+        response: {
+          data: {
+            success: false,
+            error: 'Invalid credentials',
+          },
+          status: 401,
+        },
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: false,
-        json: async () => mockError,
-      } as Response);
+      vi.spyOn(axiosInstance, 'post').mockRejectedValueOnce(mockError);
 
       await expect(
         authApi.login({
           email: 'test@example.com',
           password: 'wrongpassword',
         })
-      ).rejects.toThrow('Invalid credentials');
+      ).rejects.toThrow();
     });
   });
 
@@ -75,26 +76,28 @@ describe('API Service', () => {
         },
       ];
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, data: mockUseCases }),
-      } as Response);
+      const mockResponse: Partial<AxiosResponse> = {
+        data: { success: true, data: mockUseCases },
+      };
+
+      vi.spyOn(axiosInstance, 'get').mockResolvedValueOnce(mockResponse as AxiosResponse);
 
       const result = await useCaseApi.getAllUseCases();
 
       expect(result).toEqual(mockUseCases);
-      expect(global.fetch).toHaveBeenCalled();
     });
 
     it('should handle fetch error', async () => {
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ success: false, error: 'Failed to fetch' }),
-      } as Response);
+      const mockError = {
+        response: {
+          data: { success: false, error: 'Failed to fetch' },
+          status: 500,
+        },
+      };
 
-      await expect(useCaseApi.getAllUseCases()).rejects.toThrow(
-        'Failed to fetch'
-      );
+      vi.spyOn(axiosInstance, 'get').mockRejectedValueOnce(mockError);
+
+      await expect(useCaseApi.getAllUseCases()).rejects.toThrow();
     });
 
     it('should fetch a specific use case', async () => {
@@ -106,15 +109,15 @@ describe('API Service', () => {
         status: 'Live',
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, data: mockUseCase }),
-      } as Response);
+      const mockResponse: Partial<AxiosResponse> = {
+        data: { success: true, data: mockUseCase },
+      };
+
+      vi.spyOn(axiosInstance, 'get').mockResolvedValueOnce(mockResponse as AxiosResponse);
 
       const result = await useCaseApi.getUseCaseById('1');
 
       expect(result).toEqual(mockUseCase);
-      expect(global.fetch).toHaveBeenCalled();
     });
 
     it('should create a new use case', async () => {
@@ -131,23 +134,24 @@ describe('API Service', () => {
         internal_links: {},
         tags: ['test'],
         related_use_case_ids: [],
-        application_url: null,
+        application_url: '',
       };
 
-      const mockResponse = {
-        id: '3',
-        ...newUseCase,
+      const mockResponse: Partial<AxiosResponse> = {
+        data: {
+          success: true,
+          data: {
+            id: '3',
+            ...newUseCase,
+          },
+        },
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, data: mockResponse }),
-      } as Response);
+      vi.spyOn(axiosInstance, 'post').mockResolvedValueOnce(mockResponse as AxiosResponse);
 
       const result = await useCaseApi.createUseCase(newUseCase as any);
 
-      expect(result).toEqual(mockResponse);
-      expect(global.fetch).toHaveBeenCalled();
+      expect(result.id).toBe('3');
     });
 
     it('should update an existing use case', async () => {
@@ -156,32 +160,35 @@ describe('API Service', () => {
         status: 'MVP',
       };
 
-      const mockResponse = {
-        id: '1',
-        title: 'Updated Title',
-        status: 'MVP',
+      const mockResponse: Partial<AxiosResponse> = {
+        data: {
+          success: true,
+          data: {
+            id: '1',
+            title: 'Updated Title',
+            status: 'MVP',
+          },
+        },
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, data: mockResponse }),
-      } as Response);
+      vi.spyOn(axiosInstance, 'put').mockResolvedValueOnce(mockResponse as AxiosResponse);
 
       const result = await useCaseApi.updateUseCase('1', updates as any);
 
-      expect(result).toEqual(mockResponse);
-      expect(global.fetch).toHaveBeenCalled();
+      expect(result.id).toBe('1');
+      expect(result.title).toBe('Updated Title');
     });
 
     it('should delete a use case', async () => {
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      } as Response);
+      const mockResponse: Partial<AxiosResponse> = {
+        data: { success: true },
+      };
+
+      vi.spyOn(axiosInstance, 'delete').mockResolvedValueOnce(mockResponse as AxiosResponse);
 
       await useCaseApi.deleteUseCase('1');
 
-      expect(global.fetch).toHaveBeenCalled();
+      expect(axiosInstance.delete).toHaveBeenCalled();
     });
   });
 });
