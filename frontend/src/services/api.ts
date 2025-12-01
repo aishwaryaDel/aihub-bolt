@@ -9,13 +9,13 @@ interface ApiResponse<T> {
   message?: string;
   count?: number;
 }
+
 interface LoginCredentials {
   email: string;
   password: string;
 }
 
 interface AuthResponse {
-  token: string;
   user: {
     id: string;
     email: string;
@@ -34,19 +34,6 @@ class ApiClient {
         'Content-Type': 'application/json',
       },
     });
-
-    this.client.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem('authToken');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
 
     this.client.interceptors.response.use(
       (response) => response,

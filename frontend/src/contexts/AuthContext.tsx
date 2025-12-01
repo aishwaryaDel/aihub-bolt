@@ -8,10 +8,10 @@ export interface User {
   name: string;
   role: UserRole;
 }
+
 interface AuthContextType {
   user: User | null;
-  token: string | null;
-  login: (token: string, user: User) => void;
+  login: (user: User) => void;
   logout: () => void;
   isAdmin: () => boolean;
   isViewer: () => boolean;
@@ -22,15 +22,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
 
-  const login = (newToken: string, newUser: User) => {
-    setToken(newToken);
+  const login = (newUser: User) => {
     setUser(newUser);
   };
 
   const logout = () => {
-    setToken(null);
     setUser(null);
   };
 
@@ -38,10 +35,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isViewer = () => user?.role === 'viewer';
 
-  const isAuthenticated = () => !!user && !!token;
+  const isAuthenticated = () => !!user;
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAdmin, isViewer, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout, isAdmin, isViewer, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

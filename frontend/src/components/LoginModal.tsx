@@ -5,7 +5,7 @@ import { authApi } from '../services/api';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLoginSuccess: (token: string, user: any) => void;
+  onLoginSuccess: (user: any) => void;
 }
 export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
   const { t } = useLanguage();
@@ -30,7 +30,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
 
     try {
       const data = await authApi.login({ email, password });
-      onLoginSuccess(data.token, data.user);
+      onLoginSuccess(data.user);
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : t('login.connectionFailed'));

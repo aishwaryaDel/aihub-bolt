@@ -40,8 +40,8 @@ function AppContent() {
     setIsLoginModalOpen(true);
   };
 
-  const handleLoginSuccess = (token: string, user: any) => {
-    login(token, user);
+  const handleLoginSuccess = (user: any) => {
+    login(user);
     setCurrentScreen('overview');
   };
 
