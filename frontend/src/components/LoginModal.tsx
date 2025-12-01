@@ -7,7 +7,6 @@ interface LoginModalProps {
   onClose: () => void;
   onLoginSuccess: (token: string, user: any) => void;
 }
-
 export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
