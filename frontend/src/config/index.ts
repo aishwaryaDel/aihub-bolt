@@ -13,7 +13,7 @@
  */
 export const env = {
   api: {
-   baseUrl: import.meta.env.VITE_API_URL,
+   baseUrl: import.meta.env.VITE_API_BASE_URL,
   },
    external: {
     sharepoint: import.meta.env.VITE_SHAREPOINT_URL,
