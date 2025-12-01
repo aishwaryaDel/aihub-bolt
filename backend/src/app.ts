@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import useCaseRoutes from './routes/useCaseRoutes';
 import userRoutes from './routes/userRoutes';
-import authRoutes from './auth';
+import authRoutes from './routes/authRoutes';
 import { logTrace } from './utils/appInsights';
 
 const app = express();
