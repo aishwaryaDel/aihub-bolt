@@ -1,6 +1,9 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { UseCase, CreateUseCaseDTO, UpdateUseCaseDTO } from '../types';
-import { api, messages } from '../config';
+import { messages } from '../config';
+import { API_ROUTES, getFullApiUrl } from '../routes/routes';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface ApiResponse<T> {
   success: boolean;
@@ -29,7 +32,7 @@ class ApiClient {
 
   constructor() {
     this.client = axios.create({
-      baseURL: api.baseUrl,
+      baseURL: API_BASE_URL,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -60,7 +63,7 @@ const axiosInstance = apiClient.getInstance();
 class UseCaseApiService {
   async getAllUseCases(): Promise<UseCase[]> {
     const response = await axiosInstance.get<ApiResponse<UseCase[]>>(
-      api.endpoints.useCases
+      API_ROUTES.USE_CASES.BASE
     );
 
     if (!response.data.success || !response.data.data) {
@@ -72,7 +75,7 @@ class UseCaseApiService {
 
   async getUseCaseById(id: string): Promise<UseCase> {
     const response = await axiosInstance.get<ApiResponse<UseCase>>(
-      api.endpoints.useCaseById(id)
+      API_ROUTES.USE_CASES.BY_ID(id)
     );
 
     if (!response.data.success || !response.data.data) {
@@ -84,7 +87,7 @@ class UseCaseApiService {
 
   async createUseCase(useCaseData: CreateUseCaseDTO): Promise<UseCase> {
     const response = await axiosInstance.post<ApiResponse<UseCase>>(
-      api.endpoints.useCases,
+      API_ROUTES.USE_CASES.BASE,
       useCaseData
     );
 
@@ -97,7 +100,7 @@ class UseCaseApiService {
 
   async updateUseCase(id: string, updates: UpdateUseCaseDTO): Promise<UseCase> {
     const response = await axiosInstance.put<ApiResponse<UseCase>>(
-      api.endpoints.useCaseById(id),
+      API_ROUTES.USE_CASES.BY_ID(id),
       updates
     );
 
@@ -110,7 +113,7 @@ class UseCaseApiService {
 
   async deleteUseCase(id: string): Promise<void> {
     const response = await axiosInstance.delete<ApiResponse<void>>(
-      api.endpoints.useCaseById(id)
+      API_ROUTES.USE_CASES.BY_ID(id)
     );
 
     if (!response.data.success) {
@@ -122,7 +125,7 @@ class UseCaseApiService {
 class AuthApiService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await axiosInstance.post<ApiResponse<AuthResponse>>(
-      api.endpoints.auth.login,
+      API_ROUTES.AUTH.LOGIN,
       credentials
     );
 

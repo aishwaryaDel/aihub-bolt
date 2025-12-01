@@ -7,6 +7,8 @@
  * @module config
  */
 
+import { API_ROUTES, APP_ROUTES } from '../routes/routes';
+
 /**
  * Environment Configuration
  * All environment variables are loaded from .env file and validated here
@@ -39,14 +41,15 @@ export const database = {
 /**
  * API Endpoints Configuration
  * Centralized endpoint definitions for all API calls
+ * @deprecated Use API_ROUTES from '../routes/routes' instead
  */
 export const api = {
   baseUrl: env.api.baseUrl,
   endpoints: {
-    useCases: '/use-cases',
-    useCaseById: (id: string) => `/use-cases/${id}`,
+    useCases: API_ROUTES.USE_CASES.BASE,
+    useCaseById: (id: string) => API_ROUTES.USE_CASES.BY_ID(id),
     auth: {
-      login: '/auth/login',
+      login: API_ROUTES.AUTH.LOGIN,
     },
   },
 } as const;
@@ -54,11 +57,12 @@ export const api = {
 /**
  * Application Routes
  * Defines the routing structure of the application
+ * @deprecated Use APP_ROUTES from '../routes/routes' instead
  */
 export const routes = {
-  home: '/',
-  overview: '/overview',
-  useCase: (id: string) => `/use-case/${id}`,
+  home: APP_ROUTES.HOME,
+  overview: APP_ROUTES.OVERVIEW,
+  useCase: (id: string) => APP_ROUTES.USE_CASE(id),
 } as const;
 
 /**
@@ -188,10 +192,13 @@ export function validateConfig(): void {
 
 /**
  * Exports a utility function to get the full API endpoint URL
+ * @deprecated Use getFullApiUrl from '../routes/routes' instead
  */
 export function getApiUrl(endpoint: string): string {
   return `${api.baseUrl}${endpoint}`;
 }
+
+export { API_ROUTES, APP_ROUTES } from '../routes/routes';
 
 export default {
   env,
