@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { userService } from '../services/userService';
+import { validationService } from '../services/validationService';
 import { CreateUserDTO, UpdateUserDTO } from '../models/User';
+import { USER_MESSAGES } from '../constants/messages';
 import { logTrace, logEvent, logException } from '../utils/appInsights';
 
 export class UserController {
@@ -18,7 +20,7 @@ export class UserController {
       logException(error as Error, { context: 'getAllUsers' });
       res.status(500).json({
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch users',
+        error: error instanceof Error ? error.message : USER_MESSAGES.FETCH_ALL_ERROR,
       });
     }
   }
@@ -32,7 +34,7 @@ export class UserController {
         logTrace('Get user failed: missing ID');
         res.status(400).json({
           success: false,
-          error: 'User ID is required',
+          error: USER_MESSAGES.ID_REQUIRED,
         });
         return;
       }
@@ -43,7 +45,7 @@ export class UserController {
         logEvent('UserNotFound', { id });
         res.status(404).json({
           success: false,
-          error: 'User not found',
+          error: USER_MESSAGES.NOT_FOUND,
         });
         return;
       }
@@ -57,7 +59,7 @@ export class UserController {
       logException(error as Error, { context: 'getUserById' });
       res.status(500).json({
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch user',
+        error: error instanceof Error ? error.message : USER_MESSAGES.FETCH_ERROR,
       });
     }
   }
@@ -67,7 +69,7 @@ export class UserController {
       logTrace('Starting createUser');
       const userData: CreateUserDTO = req.body;
 
-      const validationError = this.validateUserData(userData);
+      const validationError = validationService.validateUserData(userData);
       if (validationError) {
         logTrace('Create user failed: validation error');
         res.status(400).json({
@@ -83,13 +85,13 @@ export class UserController {
       res.status(201).json({
         success: true,
         data: newUser,
-        message: 'User created successfully',
+        message: USER_MESSAGES.CREATED_SUCCESS,
       });
     } catch (error) {
       logException(error as Error, { context: 'createUser' });
       res.status(500).json({
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to create user',
+        error: error instanceof Error ? error.message : USER_MESSAGES.CREATE_ERROR,
       });
     }
   }
@@ -104,7 +106,7 @@ export class UserController {
         logTrace('Update user failed: missing ID');
         res.status(400).json({
           success: false,
-          error: 'User ID is required',
+          error: USER_MESSAGES.ID_REQUIRED,
         });
         return;
       }
@@ -113,12 +115,12 @@ export class UserController {
         logTrace('Update user failed: no data provided');
         res.status(400).json({
           success: false,
-          error: 'No update data provided',
+          error: USER_MESSAGES.NO_UPDATE_DATA,
         });
         return;
       }
 
-      const validationError = this.validateUpdateData(updates);
+      const validationError = validationService.validateUserUpdateData(updates);
       if (validationError) {
         logTrace('Update user failed: validation error');
         res.status(400).json({
@@ -134,7 +136,7 @@ export class UserController {
         logEvent('UserNotFound', { id });
         res.status(404).json({
           success: false,
-          error: 'User not found',
+          error: USER_MESSAGES.NOT_FOUND,
         });
         return;
       }
@@ -143,13 +145,13 @@ export class UserController {
       res.status(200).json({
         success: true,
         data: updatedUser,
-        message: 'User updated successfully',
+        message: USER_MESSAGES.UPDATED_SUCCESS,
       });
     } catch (error) {
       logException(error as Error, { context: 'updateUser' });
       res.status(500).json({
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to update user',
+        error: error instanceof Error ? error.message : USER_MESSAGES.UPDATE_ERROR,
       });
     }
   }
@@ -163,7 +165,7 @@ export class UserController {
         logTrace('Delete user failed: missing ID');
         res.status(400).json({
           success: false,
-          error: 'User ID is required',
+          error: USER_MESSAGES.ID_REQUIRED,
         });
         return;
       }
@@ -173,7 +175,7 @@ export class UserController {
         logEvent('UserNotFound', { id });
         res.status(404).json({
           success: false,
-          error: 'User not found',
+          error: USER_MESSAGES.NOT_FOUND,
         });
         return;
       }
@@ -183,56 +185,15 @@ export class UserController {
 
       res.status(200).json({
         success: true,
-        message: 'User deleted successfully',
+        message: USER_MESSAGES.DELETED_SUCCESS,
       });
     } catch (error) {
       logException(error as Error, { context: 'deleteUser' });
       res.status(500).json({
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to delete user',
+        error: error instanceof Error ? error.message : USER_MESSAGES.DELETE_ERROR,
       });
     }
-  }
-
-  private validateUserData(data: CreateUserDTO): string | null {
-    if (!data.email || !this.isValidEmail(data.email)) {
-      return 'Valid email is required';
-    }
-
-    if (!data.password || data.password.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-
-    if (!data.name || data.name.trim().length === 0) {
-      return 'Name is required';
-    }
-
-    if (!data.role || data.role.trim().length === 0) {
-      return 'Role is required';
-    }
-
-    return null;
-  }
-
-  private validateUpdateData(data: UpdateUserDTO): string | null {
-    if (data.email && !this.isValidEmail(data.email)) {
-      return 'Invalid email format';
-    }
-
-    if (data.name !== undefined && data.name.trim().length === 0) {
-      return 'Name cannot be empty';
-    }
-
-    if (data.role !== undefined && data.role.trim().length === 0) {
-      return 'Role cannot be empty';
-    }
-
-    return null;
-  }
-
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   }
 }
 
