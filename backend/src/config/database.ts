@@ -1,22 +1,16 @@
 import { Pool } from 'pg';
-import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import { logTrace, logMetric, logException } from '../utils/appInsights';
 
 dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
-
-export const supabase = createClient(supabaseUrl, supabaseKey);
-
 const pool = new Pool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT || 5432),
   user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD || '',
+  password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  ssl: { rejectUnauthorized: false },
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
 
 export async function query(text: string, params?: any[]) {
@@ -35,11 +29,14 @@ export async function query(text: string, params?: any[]) {
   }
 }
 
-if (supabaseUrl && supabaseKey) {
-  console.log('✅ Supabase client initialized');
-  logTrace('Supabase client initialized successfully');
-} else {
-  console.warn('⚠️ Supabase credentials missing');
-}
+pool.connect()
+  .then(() => {
+    console.log('✅ Successfully connected to PostgreSQL');
+    logTrace('Successfully connected to PostgreSQL');
+  })
+  .catch((err) => {
+    console.error('❌ Database connection failed:', err);
+    logException(err, { context: 'database.connect' });
+  });
 
 export default pool;

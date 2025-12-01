@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { supabase } from '../config/database';
+import { query } from '../config/database';
 import { logTrace, logException } from '../utils/appInsights';
 
 const SALT_ROUNDS = 10;
@@ -28,18 +28,17 @@ export class AuthService {
       logTrace('AuthService: Starting login');
       const { email, password } = credentials;
 
-      const { data: user, error } = await supabase
-        .from('users')
-        .select('id, email, password, name, role')
-        .eq('email', email)
-        .maybeSingle();
+      const result = await query(
+        'SELECT id, email, password, name, role FROM users WHERE email = $1',
+        [email]
+      );
 
-      if (error) throw error;
-
-      if (!user) {
+      if (result.rowCount === 0) {
         logTrace('AuthService: User not found');
         return null;
       }
+
+      const user = result.rows[0];
 
       const isPasswordValid = password === user.password || await bcrypt.compare(password, user.password);
 
