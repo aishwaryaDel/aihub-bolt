@@ -9,7 +9,6 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Backend-336791.svg)](https://www.postgresql.org/)
 
 ---
-
 ## 📋 Table of Contents
 
 - [Overview](#overview)
@@ -230,17 +229,18 @@ git clone <repository-url>
 cd tesa-ai-hub
 ```
 
-### 2. Install Dependencies
+### 2. Install Frontend Dependencies
 
 ```bash
+cd frontend
 npm install
 ```
 
 This will install all required packages defined in `package.json`.
 
-### 3. Environment Setup
+### 3. Frontend Environment Setup
 
-Create a `.env` file in the project root:
+Create a `.env` file in the frontend directory:
 
 ```bash
 touch .env
@@ -290,6 +290,7 @@ To customize the application:
 Start the development server:
 
 ```bash
+cd frontend
 npm run dev
 ```
 
@@ -307,6 +308,8 @@ The application will be available at:
 ### Other Commands
 
 ```bash
+cd frontend
+
 # Type checking (without building)
 npm run typecheck
 
@@ -324,6 +327,7 @@ npm run preview
 ### Create Production Build
 
 ```bash
+cd frontend
 npm run build
 ```
 
@@ -362,47 +366,68 @@ dist/assets/index-[hash].js     195.54 kB │ gzip: 58.70 kB
 ```
 tesa-ai-hub/
 │
-├── public/                        # Static assets
-│   └── image.png                 # Tesa logo
+├── frontend/                      # Frontend application
+│   ├── public/                    # Static assets
+│   │   └── image.png             # Tesa logo
+│   │
+│   ├── src/                      # Source code
+│   │   ├── components/           # React components
+│   │   │   ├── Footer.tsx
+│   │   │   ├── LoginModal.tsx
+│   │   │   ├── LanguageSwitcher.tsx
+│   │   │   ├── NewUseCaseModal.tsx
+│   │   │   ├── UseCaseCard.tsx
+│   │   │   └── UseCaseDetailModal.tsx
+│   │   │
+│   │   ├── contexts/             # React contexts
+│   │   │   ├── AuthContext.tsx  # Authentication
+│   │   │   └── LanguageContext.tsx  # Internationalization
+│   │   │
+│   │   ├── pages/                # Page components
+│   │   │   ├── App.tsx          # Root component
+│   │   │   ├── LandingPage.tsx
+│   │   │   └── UseCaseOverview.tsx
+│   │   │
+│   │   ├── services/             # API services
+│   │   │   └── api.ts           # API client
+│   │   │
+│   │   ├── config/               # Configuration
+│   │   │   └── index.ts         # Global config file
+│   │   │
+│   │   ├── types.ts              # TypeScript type definitions
+│   │   ├── main.tsx              # Entry point
+│   │   └── vite-env.d.ts        # Vite type declarations
+│   │
+│   ├── .env                      # Environment variables (not in git)
+│   ├── .gitignore                # Git ignore rules
+│   ├── eslint.config.js          # ESLint configuration
+│   ├── index.html                # HTML entry point
+│   ├── package.json              # Dependencies and scripts
+│   ├── postcss.config.js         # PostCSS configuration
+│   ├── tailwind.config.js        # Tailwind configuration
+│   ├── tsconfig.json             # TypeScript configuration
+│   ├── tsconfig.app.json        # App-specific TypeScript config
+│   ├── tsconfig.node.json       # Node-specific TypeScript config
+│   ├── vite.config.ts           # Vite configuration
+│   ├── Dockerfile                # Frontend Docker configuration
+│   └── nginx.conf                # Nginx configuration
 │
-├── src/                          # Source code
-│   ├── components/               # React components
-│   │   ├── Footer.tsx
-│   │   ├── LandingPage.tsx
-│   │   ├── LanguageSwitcher.tsx
-│   │   ├── NewUseCaseModal.tsx
-│   │   ├── UseCaseCard.tsx
-│   │   ├── UseCaseDetailModal.tsx
-│   │   └── UseCaseOverview.tsx
-│   │
-│   ├── contexts/                 # React contexts
-│   │   └── LanguageContext.tsx  # Internationalization
-│   │
-│   ├── data/                     # Data files
-│   │   └── sampleData.ts        # Sample use cases
-│   │
-│   ├── config/                   # Configuration
-│   │   └── index.ts             # Global config file
-│   │
-│   ├── types.ts                  # TypeScript type definitions
-│   ├── App.tsx                   # Root component
-│   ├── main.tsx                  # Entry point
-│   ├── index.css                 # Global styles
-│   └── vite-env.d.ts            # Vite type declarations
+├── backend/                       # Backend application
+│   ├── src/                      # Backend source code
+│   ├── migrations/               # Database migrations
+│   ├── package.json              # Backend dependencies
+│   └── ...                       # Other backend files
 │
-├── .env                          # Environment variables (not in git)
-├── .gitignore                    # Git ignore rules
-├── eslint.config.js              # ESLint configuration
-├── index.html                    # HTML entry point
-├── package.json                  # Dependencies and scripts
-├── postcss.config.js             # PostCSS configuration
-├── tailwind.config.js            # Tailwind configuration
-├── tsconfig.json                 # TypeScript configuration
-├── tsconfig.app.json            # App-specific TypeScript config
-├── tsconfig.node.json           # Node-specific TypeScript config
-├── vite.config.ts               # Vite configuration
+├── .github/                       # GitHub workflows
+│   └── workflows/
+│       ├── Trigger_frontend_deploy.yml
+│       └── Trigger_backend_deploy.yml
+│
+├── .env                          # Root environment variables (if needed)
+├── .gitignore                    # Root git ignore rules
 ├── README.md                     # This file
-└── DOCUMENTATION.md             # Detailed technical documentation
+├── API_DOCUMENTATION.md          # API documentation
+└── ROLE_BASED_ACCESS.md         # Role-based access documentation
 ```
 
 ---
@@ -419,7 +444,7 @@ The entry point of the application featuring:
 - Call-to-action button
 - Language switcher
 
-**File**: `src/components/LandingPage.tsx`
+**File**: `frontend/src/pages/LandingPage.tsx`
 
 ### UseCaseOverview
 
@@ -431,7 +456,7 @@ Main application view featuring:
 - Modal for detailed views
 - Modal for creating new use cases
 
-**File**: `src/components/UseCaseOverview.tsx`
+**File**: `frontend/src/pages/UseCaseOverview.tsx`
 
 ### UseCaseDetailModal
 
@@ -445,7 +470,7 @@ Full-screen modal showing:
 - Related use cases carousel
 - Launch application button
 
-**File**: `src/components/UseCaseDetailModal.tsx`
+**File**: `frontend/src/components/UseCaseDetailModal.tsx`
 
 ### NewUseCaseModal
 
@@ -457,7 +482,7 @@ Multi-step form wizard with:
 - Progress indicator
 - Validation at each step
 
-**File**: `src/components/NewUseCaseModal.tsx`
+**File**: `frontend/src/components/NewUseCaseModal.tsx`
 
 ---
 
@@ -518,7 +543,7 @@ The application supports English and German languages.
 
 ### Adding Translations
 
-Edit `src/contexts/LanguageContext.tsx`:
+Edit `frontend/src/contexts/LanguageContext.tsx`:
 
 ```typescript
 const translations: Record<Language, Record<string, string>> = {
@@ -563,6 +588,7 @@ git checkout -b feature/your-feature-name
 
 3. **Test Changes**:
 ```bash
+cd frontend
 npm run typecheck
 npm run lint
 npm run build
@@ -595,12 +621,14 @@ git push origin feature/your-feature-name
 ### Type Checking
 
 ```bash
+cd frontend
 npm run typecheck
 ```
 
 ### Linting
 
 ```bash
+cd frontend
 npm run lint
 ```
 
@@ -656,10 +684,11 @@ netlify deploy --prod
 
 1. Build the project:
 ```bash
+cd frontend
 npm run build
 ```
 
-2. Upload the `dist/` directory to your hosting provider
+2. Upload the `frontend/dist/` directory to your hosting provider
 
 3. Configure environment variables on the hosting platform
 
@@ -717,6 +746,8 @@ npm run dev -- --port 3000
 
 **Solution**:
 ```bash
+cd frontend
+
 # Check for specific errors
 npm run typecheck
 
@@ -729,9 +760,9 @@ npm install --save-dev @types/react @types/react-dom
 **Problem**: `npm run build` fails
 
 **Solution**:
-1. Clear cache: `rm -rf node_modules dist .vite`
-2. Reinstall: `npm install`
-3. Try building again: `npm run build`
+1. Clear cache: `rm -rf frontend/node_modules frontend/dist frontend/.vite`
+2. Reinstall: `cd frontend && npm install`
+3. Try building again: `cd frontend && npm run build`
 
 ---
 
