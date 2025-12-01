@@ -9,7 +9,6 @@ This document provides comprehensive documentation for the Use Case CRUD API. Th
 ```
 http://localhost:3001/api
 ```
-
 ## Database Schema
 
 ### use_cases Table
