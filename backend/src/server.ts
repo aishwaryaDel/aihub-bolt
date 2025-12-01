@@ -1,31 +1,33 @@
-import dotenv from 'dotenv';
+import 'reflect-metadata';
 import app from './app';
-import { initializeAppInsights, logTrace, logEvent } from './utils/appInsights';
-import { swaggerUi, swaggerSpec } from './config/swagger';
+import { connectDatabase } from './config/database.config';
+import env from './config/env.config';
+import { logger } from './config/logger.config';
 
-dotenv.config();
+const startServer = async (): Promise<void> => {
+  try {
+    await connectDatabase();
 
+    const server = app.listen(env.node.port, () => {
+      logger.info(`✓ Server running on port ${env.node.port}`);
+      logger.info(`✓ Environment: ${env.node.env}`);
+      logger.info(`✓ Health check: http://localhost:${env.node.port}/health`);
+    });
 
-initializeAppInsights();
-logTrace('Server initialization started');
+    const gracefulShutdown = async (signal: string): Promise<void> => {
+      logger.info(`${signal} received. Starting graceful shutdown...`);
+      server.close(async () => {
+        logger.info('Server closed');
+        process.exit(0);
+      });
+    };
 
-// Swagger UI setup
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  } catch (error) {
+    logger.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
 
-// Expose raw swagger JSON for debugging (helps verify what swagger-jsdoc produced)
-app.get('/api-docs.json', (req, res) => {
-  res.json(swaggerSpec);
-});
-
-// Log summary of swagger spec at startup to help troubleshoot 'No operations defined'
-const pathsCount = swaggerSpec && swaggerSpec.paths ? Object.keys(swaggerSpec.paths).length : 0;
-console.log(`📚 Swagger spec generated with ${pathsCount} path(s)`);
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`✅ Server läuft auf Port ${PORT}`);
-  logEvent('ServerStarted', { port: PORT.toString() });
-  logTrace(`Server successfully started on port ${PORT}`);
-});
-
- 
+startServer();
