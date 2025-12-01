@@ -1,9 +1,6 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { UseCase, CreateUseCaseDTO, UpdateUseCaseDTO } from '../types';
-import { messages } from '../config';
-import { API_ROUTES, getFullApiUrl } from '../routes/routes';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { api, messages } from '../config';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -32,7 +29,7 @@ class ApiClient {
 
   constructor() {
     this.client = axios.create({
-      baseURL: API_BASE_URL,
+      baseURL: api.baseUrl,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -52,6 +49,38 @@ class ApiClient {
     );
   }
 
+  async get<T>(url: string) {
+    const response = await this.client.get<ApiResponse<T>>(url);
+    if (!response.data.success || response.data.data === undefined) {
+      throw new Error(response.data.error || messages.errors.unexpected);
+    }
+    return response.data.data;
+  }
+
+  async post<T>(url: string, data?: any) {
+    const response = await this.client.post<ApiResponse<T>>(url, data);
+    if (!response.data.success || response.data.data === undefined) {
+      throw new Error(response.data.error || messages.errors.unexpected);
+    }
+    return response.data.data;
+  }
+
+  async put<T>(url: string, data?: any) {
+    const response = await this.client.put<ApiResponse<T>>(url, data);
+    if (!response.data.success || response.data.data === undefined) {
+      throw new Error(response.data.error || messages.errors.unexpected);
+    }
+    return response.data.data;
+  }
+
+  async delete<T>(url: string) {
+    const response = await this.client.delete<ApiResponse<T>>(url);
+    if (!response.data.success) {
+      throw new Error(response.data.error || messages.errors.unexpected);
+    }
+    return response.data.data;
+  }
+
   getInstance(): AxiosInstance {
     return this.client;
   }
@@ -62,78 +91,29 @@ const axiosInstance = apiClient.getInstance();
 
 class UseCaseApiService {
   async getAllUseCases(): Promise<UseCase[]> {
-    const response = await axiosInstance.get<ApiResponse<UseCase[]>>(
-      API_ROUTES.USE_CASES.BASE
-    );
-
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || messages.errors.loadUseCases);
-    }
-
-    return response.data.data;
+    return apiClient.get<UseCase[]>(api.endpoints.useCases);
   }
 
   async getUseCaseById(id: string): Promise<UseCase> {
-    const response = await axiosInstance.get<ApiResponse<UseCase>>(
-      API_ROUTES.USE_CASES.BY_ID(id)
-    );
-
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || messages.errors.loadUseCases);
-    }
-
-    return response.data.data;
+    return apiClient.get<UseCase>(api.endpoints.useCaseById(id));
   }
 
   async createUseCase(useCaseData: CreateUseCaseDTO): Promise<UseCase> {
-    const response = await axiosInstance.post<ApiResponse<UseCase>>(
-      API_ROUTES.USE_CASES.BASE,
-      useCaseData
-    );
-
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || messages.errors.saveUseCase);
-    }
-
-    return response.data.data;
+    return apiClient.post<UseCase>(api.endpoints.useCases, useCaseData);
   }
 
   async updateUseCase(id: string, updates: UpdateUseCaseDTO): Promise<UseCase> {
-    const response = await axiosInstance.put<ApiResponse<UseCase>>(
-      API_ROUTES.USE_CASES.BY_ID(id),
-      updates
-    );
-
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || messages.errors.saveUseCase);
-    }
-
-    return response.data.data;
+    return apiClient.put<UseCase>(api.endpoints.useCaseById(id), updates);
   }
 
   async deleteUseCase(id: string): Promise<void> {
-    const response = await axiosInstance.delete<ApiResponse<void>>(
-      API_ROUTES.USE_CASES.BY_ID(id)
-    );
-
-    if (!response.data.success) {
-      throw new Error(response.data.error || messages.errors.deleteUseCase);
-    }
+    await apiClient.delete<void>(api.endpoints.useCaseById(id));
   }
 }
 
 class AuthApiService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await axiosInstance.post<ApiResponse<AuthResponse>>(
-      API_ROUTES.AUTH.LOGIN,
-      credentials
-    );
-
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || messages.errors.loginFailed);
-    }
-
-    return response.data.data;
+    return apiClient.post<AuthResponse>(api.endpoints.auth.login, credentials);
   }
 }
 
