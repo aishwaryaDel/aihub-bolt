@@ -5,8 +5,8 @@ on:
     branches:
       - dev
       - main
-    paths:
-      - 'frontend/**'
+    paths-ignore:
+      - 'backend/**'
   workflow_dispatch:
 
 jobs:
