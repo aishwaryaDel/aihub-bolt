@@ -42,7 +42,7 @@ export class ApiClient {
     return response.data.data;
   }
 
-  async post<T>(url: string, data?: any) {
+  async post<T>(url: string, data?: unknown) {
     const response = await this.client.post<ApiResponse<T>>(url, data);
     if (!response.data.success || response.data.data === undefined) {
       throw new Error(response.data.error || messages.errors.unexpected);
@@ -50,7 +50,7 @@ export class ApiClient {
     return response.data.data;
   }
 
-  async put<T>(url: string, data?: any) {
+  async put<T>(url: string, data?: unknown) {
     const response = await this.client.put<ApiResponse<T>>(url, data);
     if (!response.data.success || response.data.data === undefined) {
       throw new Error(response.data.error || messages.errors.unexpected);

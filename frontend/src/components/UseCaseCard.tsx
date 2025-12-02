@@ -52,7 +52,7 @@ export default function UseCaseCard({ useCase, onClick }: UseCaseCardProps) {
           {useCase.short_description}
         </p>
         <div className="flex flex-wrap gap-2 mb-3">
-          {useCase.tags.slice(0, 3).map((tag, index) => (
+          {useCase.tags?.slice(0, 3).map((tag: string, index: number) => (
             <span
               key={index}
               className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded"
@@ -62,7 +62,7 @@ export default function UseCaseCard({ useCase, onClick }: UseCaseCardProps) {
           ))}
         </div>
         <p className="text-sm text-gray-400">
-          By {useCase.owner_name} – {useCase.department}
+          By {useCase.owner_name || 'Unknown'} – {useCase.department}
         </p>
       </div>
     </div>

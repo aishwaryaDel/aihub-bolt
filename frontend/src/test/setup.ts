@@ -7,7 +7,8 @@ expect.extend(matchers);
 afterEach(() => {
   cleanup();
 });
-global.fetch = vi.fn();
+
+globalThis.fetch = vi.fn();
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

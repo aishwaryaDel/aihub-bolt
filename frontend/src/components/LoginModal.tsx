@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { X, Eye, EyeOff, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { authApi } from '../services';
+import { User } from '../types';
+
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLoginSuccess: (user: any) => void;
+  onLoginSuccess: (token: string, user: User) => void;
 }
 export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
   const { t } = useLanguage();
@@ -30,7 +32,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
 
     try {
       const data = await authApi.login({ email, password });
-      onLoginSuccess(data.user);
+      onLoginSuccess(data.token, data.user);
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : t('login.connectionFailed'));

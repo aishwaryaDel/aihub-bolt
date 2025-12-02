@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useCaseApi, authApi, axiosInstance } from '../api';
+import { useCaseApi } from '../usecaseApi';
+import { authApi } from '../authApi';
+import { apiClient } from '../apiClient';
+import { CreateUseCaseDTO, UpdateUseCaseDTO } from '../../types';
 import type { AxiosResponse } from 'axios';
+
+const axiosInstance = apiClient.getInstance();
 
 describe('API Service', () => {
   beforeEach(() => {
@@ -148,7 +153,7 @@ describe('API Service', () => {
 
       vi.spyOn(axiosInstance, 'post').mockResolvedValueOnce(mockResponse as AxiosResponse);
 
-      const result = await useCaseApi.createUseCase(newUseCase as any);
+      const result = await useCaseApi.createUseCase(newUseCase as CreateUseCaseDTO);
 
       expect(result.id).toBe('3');
     });
@@ -172,7 +177,7 @@ describe('API Service', () => {
 
       vi.spyOn(axiosInstance, 'put').mockResolvedValueOnce(mockResponse as AxiosResponse);
 
-      const result = await useCaseApi.updateUseCase('1', updates as any);
+      const result = await useCaseApi.updateUseCase('1', updates as UpdateUseCaseDTO);
 
       expect(result.id).toBe('1');
       expect(result.title).toBe('Updated Title');

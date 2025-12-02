@@ -11,7 +11,8 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;
+  token: string | null;
+  login: (token: string, user: User) => void;
   logout: () => void;
   isAdmin: () => boolean;
   isViewer: () => boolean;
@@ -22,12 +23,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
-  const login = (newUser: User) => {
+  const login = (newToken: string, newUser: User) => {
+    setToken(newToken);
     setUser(newUser);
   };
 
   const logout = () => {
+    setToken(null);
     setUser(null);
   };
 
@@ -38,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAuthenticated = () => !!user;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin, isViewer, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, token, login, logout, isAdmin, isViewer, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

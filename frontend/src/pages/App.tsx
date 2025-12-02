@@ -4,7 +4,7 @@ import UseCaseOverview from './UseCaseOverview';
 import LoginModal from '../components/LoginModal';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
-import { UseCase } from '../types';
+import { UseCase, User } from '../types';
 import { useCaseApi } from '../services';
 import { messages } from '../config';
 
@@ -32,16 +32,16 @@ function AppContent() {
 
   useEffect(() => {
     if (currentScreen === 'overview' && isAuthenticated()) {
-      fetchUseCases();
+      void fetchUseCases();
     }
-  }, [currentScreen]);
+  }, [currentScreen, isAuthenticated]);
 
   const handleStartJourney = () => {
     setIsLoginModalOpen(true);
   };
 
-  const handleLoginSuccess = (user: any) => {
-    login(user);
+  const handleLoginSuccess = (token: string, user: User) => {
+    login(token, user);
     setCurrentScreen('overview');
   };
 

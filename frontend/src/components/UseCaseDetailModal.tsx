@@ -137,11 +137,11 @@ export default function UseCaseDetailModal({
               </section>
             )}
 
-            {useCase.technology_stack.length > 0 && (
+            {useCase.technology_stack && useCase.technology_stack.length > 0 && (
               <section>
                 <h2 className="text-lg font-bold text-gray-900 mb-2">{t('modal.technologyStack')}</h2>
                 <div className="flex flex-wrap gap-2">
-                  {useCase.technology_stack.map((tech, index) => (
+                  {useCase.technology_stack.map((tech: string, index: number) => (
                     <span
                       key={index}
                       className="bg-gray-900 text-white px-3 py-1 rounded-md text-sm font-medium"
@@ -153,13 +153,13 @@ export default function UseCaseDetailModal({
               </section>
             )}
 
-            {Object.keys(useCase.internal_links).length > 0 && (
+            {useCase.internal_links && Object.keys(useCase.internal_links).length > 0 && (
               <section>
                 <h2 className="text-lg font-bold text-gray-900 mb-2">{t('modal.internalLinks')}</h2>
                 <div className="space-y-2">
                   {useCase.internal_links.sharepoint && (
                     <a
-                      href={useCase.internal_links.sharepoint}
+                      href={useCase.internal_links?.sharepoint}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block text-[#E30613] hover:underline"
@@ -167,9 +167,9 @@ export default function UseCaseDetailModal({
                       {t('modal.sharepoint')}
                     </a>
                   )}
-                  {useCase.internal_links.confluence && (
+                  {useCase.internal_links?.confluence && (
                     <a
-                      href={useCase.internal_links.confluence}
+                      href={useCase.internal_links?.confluence}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block text-[#E30613] hover:underline"
@@ -177,9 +177,9 @@ export default function UseCaseDetailModal({
                       {t('modal.confluence')}
                     </a>
                   )}
-                  {useCase.internal_links.demo && (
+                  {useCase.internal_links?.demo && (
                     <a
-                      href={useCase.internal_links.demo}
+                      href={useCase.internal_links?.demo}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block text-[#E30613] hover:underline"
@@ -191,12 +191,12 @@ export default function UseCaseDetailModal({
               </section>
             )}
 
-            {useCase.internal_links.bits && (
+            {useCase.internal_links?.bits && (
               <section>
                 <h2 className="text-lg font-bold text-gray-900 mb-2">{t('modal.rolesResponsibilities')}</h2>
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <a
-                    href={useCase.internal_links.bits}
+                    href={useCase.internal_links?.bits}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block text-[#E30613] hover:underline font-medium"

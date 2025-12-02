@@ -1,5 +1,6 @@
 import { api } from '../config';
 import { apiClient } from './apiClient';
+import { User } from '../types';
 
 interface LoginCredentials {
   email: string;
@@ -7,12 +8,8 @@ interface LoginCredentials {
 }
 
 interface AuthResponse {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-  };
+  token: string;
+  user: User;
 }
 
 class AuthApiService {
