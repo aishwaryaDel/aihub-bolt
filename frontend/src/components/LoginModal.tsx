@@ -1,15 +1,12 @@
 import { useState } from 'react';
 import { X, Eye, EyeOff, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { authApi } from '../services/authApi';
-import { UI_CONSTANTS, STYLE_CONSTANTS, CONSOLE_MESSAGES } from '../config/constants';
-
+import { authApi } from '../services/api';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoginSuccess: (user: any) => void;
 }
-
 export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
@@ -50,72 +47,72 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
 
   return (
     <div
-      className={STYLE_CONSTANTS.CLASS_NAMES.MODAL_OVERLAY}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={handleOverlayClick}
     >
-      <div className={STYLE_CONSTANTS.CLASS_NAMES.MODAL_CONTAINER}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative">
         <button
           onClick={onClose}
-          className={STYLE_CONSTANTS.CLASS_NAMES.CLOSE_BUTTON}
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
         >
-          <X size={UI_CONSTANTS.ICON_SIZES.MEDIUM} />
+          <X size={24} />
         </button>
 
-        <div className={STYLE_CONSTANTS.SPACING.MODAL_PADDING}>
-          <div className={`flex justify-center ${STYLE_CONSTANTS.SPACING.LOGO_MARGIN}`}>
+        <div className="p-8">
+          <div className="flex justify-center mb-6">
             <img
-              src={UI_CONSTANTS.IMAGES.LOGO_PATH}
-              alt={UI_CONSTANTS.IMAGES.LOGO_ALT}
-              className={`${STYLE_CONSTANTS.SPACING.LOGO_HEIGHT} w-auto`}
+              src="/image.png"
+              alt="Tesa logo"
+              className="h-16 w-auto"
             />
           </div>
 
-          <h2 className={STYLE_CONSTANTS.CLASS_NAMES.HEADING}>
+          <h2 className="text-3xl font-bold text-slate-800 text-center mb-8">
             {t('login.title')}
           </h2>
 
-          <form onSubmit={handleSubmit} className={STYLE_CONSTANTS.SPACING.FORM}>
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor={UI_CONSTANTS.FORM.IDS.EMAIL} className={STYLE_CONSTANTS.CLASS_NAMES.FORM_LABEL}>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                 {t('login.email')}
               </label>
               <input
-                type={UI_CONSTANTS.FORM.TYPES.EMAIL}
-                id={UI_CONSTANTS.FORM.IDS.EMAIL}
+                type="email"
+                id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('login.emailPlaceholder')}
-                className={STYLE_CONSTANTS.CLASS_NAMES.INPUT_FIELD}
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 disabled={isLoading}
               />
             </div>
 
             <div>
-              <label htmlFor={UI_CONSTANTS.FORM.IDS.PASSWORD} className={STYLE_CONSTANTS.CLASS_NAMES.FORM_LABEL}>
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
                 {t('login.password')}
               </label>
               <div className="relative">
                 <input
-                  type={showPassword ? UI_CONSTANTS.FORM.TYPES.TEXT : UI_CONSTANTS.FORM.TYPES.PASSWORD}
-                  id={UI_CONSTANTS.FORM.IDS.PASSWORD}
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={t('login.passwordPlaceholder')}
-                  className={STYLE_CONSTANTS.CLASS_NAMES.INPUT_FIELD}
+                  className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className={STYLE_CONSTANTS.CLASS_NAMES.PASSWORD_TOGGLE}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 >
-                  {showPassword ? <EyeOff size={UI_CONSTANTS.ICON_SIZES.SMALL} /> : <Eye size={UI_CONSTANTS.ICON_SIZES.SMALL} />}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
 
             {error && (
-              <div className={STYLE_CONSTANTS.CLASS_NAMES.ERROR_BOX}>
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm">
                 {error}
               </div>
             )}
@@ -123,35 +120,35 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
             <button
               type="submit"
               disabled={isLoading}
-              className={STYLE_CONSTANTS.CLASS_NAMES.PRIMARY_BUTTON}
+              className="w-full bg-[#E30613] hover:bg-[#c00510] text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? t('login.loggingIn') : t('login.loginButton')}
             </button>
 
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className={STYLE_CONSTANTS.CLASS_NAMES.DIVIDER_LINE}></div>
+                <div className="w-full border-t border-slate-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className={STYLE_CONSTANTS.CLASS_NAMES.DIVIDER_TEXT}>{UI_CONSTANTS.TEXT.OR_DIVIDER}</span>
+                <span className="px-4 bg-white text-slate-500">or</span>
               </div>
             </div>
 
             <button
               type="button"
               onClick={() => {
-                console.log(CONSOLE_MESSAGES.AZURE_AD_CLICKED);
+                console.log('Azure AD login clicked');
               }}
-              className={STYLE_CONSTANTS.CLASS_NAMES.SECONDARY_BUTTON}
+              className="w-full bg-slate-700 hover:bg-slate-800 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              <ExternalLink size={UI_CONSTANTS.ICON_SIZES.SMALL} />
-              {UI_CONSTANTS.BUTTON_LABELS.AZURE_AD_SIGNIN}
+              <ExternalLink size={20} />
+              Sign in with Azure AD
             </button>
 
             <div className="text-center mt-4">
               <button
                 type="button"
-                className={STYLE_CONSTANTS.CLASS_NAMES.LINK_BUTTON}
+                className="text-blue-600 hover:text-blue-700 text-sm transition-colors"
               >
                 {t('login.forgotPassword')}
               </button>
