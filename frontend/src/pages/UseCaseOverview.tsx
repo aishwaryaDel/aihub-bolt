@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useCaseApi } from '../services/api';
+import { useCaseApi } from '../services';
 import { Search, Home, Plus } from 'lucide-react';
 import { UseCase, Department, UseCaseStatus } from '../types';
 import UseCaseCard from '../components/UseCaseCard';
