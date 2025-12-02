@@ -1,263 +1,240 @@
-import { X } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { useCaseApi } from '../services';
+import { Search, Home, Plus } from 'lucide-react';
 import { UseCase } from '../types';
+import UseCaseCard from '../components/UseCaseCard';
+import UseCaseDetailModal from '../components/UseCaseDetailModal';
+import NewUseCaseModal, { NewUseCaseData } from '../components/NewUseCaseModal';
+import Footer from '../components/Footer';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
-import { STATUS_SEQUENCE, DEFAULT_IMAGES, STATUS_COLORS, Department, UseCaseStatus } from '../constants/constants';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import { messages } from '../config';
+import { DEPARTMENTS, STATUS_SEQUENCE, Department, UseCaseStatus } from '../constants/constants';
 
-interface UseCaseDetailModalProps {
-  useCase: UseCase;
-  onClose: () => void;
-  relatedUseCases: UseCase[];
-  onRelatedClick: (id: string) => void;
-  onUpdateClick?: () => void;
+interface UseCaseOverviewProps {
+  useCases: UseCase[];
+  onBackToHome: () => void;
+  isLoading?: boolean;
+  error?: string | null;
+  onRefresh?: () => void;
 }
 
-export default function UseCaseDetailModal({
-  useCase,
-  onClose,
-  relatedUseCases,
-  onRelatedClick,
-  onUpdateClick
-}: UseCaseDetailModalProps) {
+const departments: Array<'All' | Department> = ['All', ...DEPARTMENTS];
+const statuses: Array<'All' | UseCaseStatus> = ['All', ...STATUS_SEQUENCE];
+
+export default function UseCaseOverview({ useCases, onBackToHome, isLoading = false, error = null, onRefresh }: UseCaseOverviewProps) {
   const { t } = useLanguage();
   const { isAdmin } = useAuth();
-  const imageUrl = useCase.image_url || DEFAULT_IMAGES[useCase.department as Department];
-  const statusColor = STATUS_COLORS[useCase.status as UseCaseStatus] || 'bg-gray-500';
-  const currentStageIndex = STATUS_SEQUENCE.indexOf(useCase.status as UseCaseStatus);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState<'All' | Department>('All');
+  const [selectedStatus, setSelectedStatus] = useState<'All' | UseCaseStatus>('All');
+  const [selectedUseCase, setSelectedUseCase] = useState<UseCase | null>(null);
+  const [showNewUseCaseModal, setShowNewUseCaseModal] = useState(false);
+  const [useCaseToUpdate, setUseCaseToUpdate] = useState<UseCase | null>(null);
+
+  const filteredUseCases = useMemo(() => {
+    return useCases.filter((useCase) => {
+      const matchesSearch =
+        searchQuery === '' ||
+        useCase.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        useCase.short_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        useCase.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesDepartment =
+        selectedDepartment === 'All' || useCase.department === selectedDepartment;
+
+      const matchesStatus = selectedStatus === 'All' || useCase.status === selectedStatus;
+
+      return matchesSearch && matchesDepartment && matchesStatus;
+    });
+  }, [useCases, searchQuery, selectedDepartment, selectedStatus]);
+
+  const relatedUseCases = useMemo(() => {
+    if (!selectedUseCase) return [];
+    return useCases.filter((uc) =>
+      selectedUseCase.related_use_case_ids.includes(uc.id)
+    );
+  }, [selectedUseCase, useCases]);
+
+  const handleRelatedClick = (id: string) => {
+    const useCase = useCases.find((uc) => uc.id === id);
+    if (useCase) {
+      setSelectedUseCase(useCase);
+    }
+  };
+
+  const handleNewUseCaseSubmit = async (data: NewUseCaseData, useCaseId?: string) => {
+    try {
+      if (useCaseId) {
+        await useCaseApi.updateUseCase(useCaseId, data);
+      } else {
+        await useCaseApi.createUseCase(data);
+      }
+      if (onRefresh) onRefresh();
+    } catch (error) {
+      console.error(messages.errors.saveUseCase, error);
+    }
+  };
+
+  const handleCardClick = (useCase: UseCase) => {
+    setSelectedUseCase(useCase);
+  };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex-shrink-0 relative">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors duration-200"
-            aria-label="Close modal"
-          >
-            <X className="w-6 h-6 text-gray-600" />
-          </button>
-
-          <div className="relative h-[200px] w-full overflow-hidden rounded-t-lg">
-            <img
-              src={imageUrl}
-              alt={useCase.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <h3 className="text-white text-4xl font-bold">
-                {t(`department.${useCase.department}`)}
-              </h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-6 py-6">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {useCase.title}
-            </h1>
+    <div className="min-h-screen bg-white flex flex-col">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="grid grid-cols-3 items-center gap-4 mb-4">
             <div className="flex items-center gap-3">
-              <span
-                className={`${statusColor} text-white px-3 py-1 rounded-full text-sm font-medium`}
+              <img
+                src="/image.png"
+                alt="tesa logo"
+                className="h-12 w-auto"
+              />
+              <button
+                onClick={onBackToHome}
+                className="flex items-center gap-2 px-3 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200"
               >
-                {t(`status.${useCase.status}`)}
-              </span>
-              <span className="text-gray-600 font-medium">{t(`department.${useCase.department}`)}</span>
+                <Home className="w-4 h-4" />
+                <span className="hidden lg:inline">{t('overview.backToHome')}</span>
+              </button>
+            </div>
+            <div className="flex justify-center">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                {t('overview.title')}
+              </h1>
+            </div>
+            <div className="flex items-center justify-end gap-3">
+              {isAdmin() && (
+                <button
+                  onClick={() => setShowNewUseCaseModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 text-white bg-[#E30613] rounded-lg hover:bg-[#c00510] transition-colors duration-200"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t('overview.newUseCase')}</span>
+                </button>
+              )}
+              <LanguageSwitcher />
             </div>
           </div>
 
-          <div className="space-y-6">
-            <section>
-              <h2 className="text-lg font-bold text-gray-900 mb-2">{t('modal.description')}</h2>
-              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {useCase.full_description}
-              </p>
-            </section>
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder={t('overview.search')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full max-w-full lg:max-w-[640px] pl-10 pr-4 py-3 bg-[#f2f2f2] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E30613] transition-all duration-200"
+              />
+            </div>
 
-            <section>
-              <h2 className="text-lg font-bold text-gray-900 mb-2">{t('modal.ownerDetails')}</h2>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-900 font-medium">{useCase.owner_name}</p>
-                <p className="text-gray-600">{t(`department.${useCase.department}`)}</p>
-                <a
-                  href={`mailto:${useCase.owner_email}`}
-                  className="text-[#E30613] hover:underline"
-                >
-                  {useCase.owner_email}
-                </a>
-              </div>
-            </section>
+            <div className="flex gap-4 flex-col sm:flex-row">
+              <select
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value as 'All' | Department)}
+                className="px-4 py-3 bg-[#f2f2f2] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E30613] cursor-pointer transition-all duration-200"
+              >
+                {departments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept === 'All' ? t('overview.allDepartments') : t(`department.${dept}`)}
+                  </option>
+                ))}
+              </select>
 
-            <section>
-              <h2 className="text-lg font-bold text-gray-900 mb-3">{t('modal.useCaseStage')}</h2>
-              <div className="relative">
-                <div className="flex justify-between mb-2">
-                  {STATUS_SEQUENCE.map((stage, index) => (
-                    <div
-                      key={stage}
-                      className={`flex-1 text-center ${
-                        index <= currentStageIndex
-                          ? 'text-[#E30613] font-medium'
-                          : 'text-gray-400'
-                      }`}
-                    >
-                      <div
-                        className={`w-3 h-3 rounded-full mx-auto mb-1 ${
-                          index <= currentStageIndex ? 'bg-[#E30613]' : 'bg-gray-300'
-                        }`}
-                      />
-                      <span className="text-xs hidden sm:inline">{t(`status.${stage}`)}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[#E30613] transition-all duration-500"
-                    style={{
-                          width: `${((currentStageIndex + 1) / STATUS_SEQUENCE.length) * 100}%`
-                    }}
-                  />
-                </div>
-              </div>
-            </section>
-
-            {useCase.business_impact && (
-              <section>
-                <h2 className="text-lg font-bold text-gray-900 mb-2">{t('modal.businessImpact')}</h2>
-                <p className="text-gray-700 bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                  {useCase.business_impact}
-                </p>
-              </section>
-            )}
-
-            {useCase.technology_stack && useCase.technology_stack.length > 0 && (
-              <section>
-                <h2 className="text-lg font-bold text-gray-900 mb-2">{t('modal.technologyStack')}</h2>
-                <div className="flex flex-wrap gap-2">
-                  {useCase.technology_stack.map((tech: string, index: number) => (
-                    <span
-                      key={index}
-                      className="bg-gray-900 text-white px-3 py-1 rounded-md text-sm font-medium"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {useCase.internal_links && Object.keys(useCase.internal_links).length > 0 && (
-              <section>
-                <h2 className="text-lg font-bold text-gray-900 mb-2">{t('modal.internalLinks')}</h2>
-                <div className="space-y-2">
-                  {useCase.internal_links.sharepoint && (
-                    <a
-                      href={useCase.internal_links?.sharepoint}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block text-[#E30613] hover:underline"
-                    >
-                      {t('modal.sharepoint')}
-                    </a>
-                  )}
-                  {useCase.internal_links?.confluence && (
-                    <a
-                      href={useCase.internal_links?.confluence}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block text-[#E30613] hover:underline"
-                    >
-                      {t('modal.confluence')}
-                    </a>
-                  )}
-                  {useCase.internal_links?.demo && (
-                    <a
-                      href={useCase.internal_links?.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block text-[#E30613] hover:underline"
-                    >
-                      {t('modal.demo')}
-                    </a>
-                  )}
-                </div>
-              </section>
-            )}
-
-            {useCase.internal_links?.bits && (
-              <section>
-                <h2 className="text-lg font-bold text-gray-900 mb-2">{t('modal.rolesResponsibilities')}</h2>
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                  <a
-                    href={useCase.internal_links?.bits}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-[#E30613] hover:underline font-medium"
-                  >
-                    {t('modal.requestRoles')}
-                  </a>
-                </div>
-              </section>
-            )}
-
-            {relatedUseCases.length > 0 && (
-              <section>
-                <h2 className="text-lg font-bold text-gray-900 mb-3">{t('modal.relatedUseCases')}</h2>
-                <div className="flex gap-4 overflow-x-auto pb-2">
-                  {relatedUseCases.map((related) => (
-                    <div
-                      key={related.id}
-                      onClick={() => onRelatedClick(related.id)}
-                      className="flex-shrink-0 w-64 bg-gray-50 rounded-lg p-3 cursor-pointer hover:shadow-md transition-shadow duration-200"
-                    >
-                      <h3 className="font-bold text-sm text-gray-900 mb-1 line-clamp-2">
-                        {related.title}
-                      </h3>
-                      <p className="text-xs text-gray-600 line-clamp-2">
-                        {related.short_description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value as 'All' | UseCaseStatus)}
+                className="px-4 py-3 bg-[#f2f2f2] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E30613] cursor-pointer transition-all duration-200"
+              >
+                {statuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status === 'All' ? t('overview.allStatuses') : t(`status.${status}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
+      </header>
 
-        <div className="flex-shrink-0 border-t border-gray-200 px-6 py-4">
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                if (useCase.application_url && (useCase.status === 'Live' || useCase.status === 'MVP')) {
-                  window.open(useCase.application_url, '_blank');
-                }
-              }}
-              disabled={!useCase.application_url || (useCase.status !== 'Live' && useCase.status !== 'MVP')}
-              className={`flex-[2] px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${
-                useCase.application_url && (useCase.status === 'Live' || useCase.status === 'MVP')
-                  ? 'bg-[#E30613] text-white hover:bg-[#c00510]'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              {t('modal.launchApplication')}
-            </button>
-            {isAdmin() && (
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between">
+            <div>
+              <p className="text-red-800 font-medium">{messages.errors.errorLoadingUseCases}</p>
+              <p className="text-red-600 text-sm mt-1">{error}</p>
+            </div>
+            {onRefresh && (
               <button
-                onClick={onUpdateClick}
-                className="flex-1 px-6 py-3 rounded-lg font-medium bg-[#E30613] text-white hover:bg-[#c00510] transition-colors duration-200"
+                onClick={onRefresh}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
               >
-                Update
+                {messages.actions.retry}
               </button>
             )}
           </div>
-        </div>
-      </div>
+        )}
+
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#E30613]"></div>
+            <p className="mt-4 text-gray-600">{messages.loading.useCases}</p>
+          </div>
+        ) : (
+          <>
+            <div className="mb-4 text-gray-600">
+              {t('overview.showing')} {filteredUseCases.length} {t('overview.of')} {useCases.length} {t('overview.useCases')}
+            </div>
+
+            {filteredUseCases.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-xl text-gray-500">{t('overview.noResults')}</p>
+                <p className="text-gray-400 mt-2">{t('overview.tryAdjusting')}</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredUseCases.map((useCase) => (
+                  <UseCaseCard
+                    key={useCase.id}
+                    useCase={useCase}
+                    onClick={() => handleCardClick(useCase)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </main>
+
+      <Footer />
+
+      {selectedUseCase && (
+        <UseCaseDetailModal
+          useCase={selectedUseCase}
+          onClose={() => setSelectedUseCase(null)}
+          relatedUseCases={relatedUseCases}
+          onRelatedClick={handleRelatedClick}
+          onUpdateClick={() => {
+            setUseCaseToUpdate(selectedUseCase);
+            setShowNewUseCaseModal(true);
+            setSelectedUseCase(null);
+          }}
+        />
+      )}
+
+      {showNewUseCaseModal && (
+        <NewUseCaseModal
+          onClose={() => {
+            setShowNewUseCaseModal(false);
+            setUseCaseToUpdate(null);
+          }}
+          onSubmit={handleNewUseCaseSubmit}
+          existingUseCase={useCaseToUpdate}
+        />
+      )}
     </div>
   );
 }
