@@ -2,17 +2,17 @@ export const API_ROUTES = {
   BASE: '/api',
 
   AUTH: {
-    BASE: '/api/auth',
-    LOGIN: '/api/auth/login',
+    BASE: '/auth',
+    LOGIN: '/auth/login',
   },
 
   USE_CASES: {
-    BASE: '/api/use-cases',
-    BY_ID: (id: string) => `/api/use-cases/${id}`,
+    BASE: '/use-cases',
+    BY_ID: (id: string) => `/use-cases/${id}`,
   },
 
   USERS: {
-    BASE: '/api/users',
+    BASE: '/users',
     BY_ID: (id: string) => `/api/users/${id}`,
   },
 } as const;
