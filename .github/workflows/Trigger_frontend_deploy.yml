@@ -1,12 +1,12 @@
-name: Frontend Docker Pipeline Trigger
+name: Frontend Deployment Trigger
 
 on:
   push:
     branches:
       - dev
       - main
-    paths-ignore:
-      - 'backend/**'
+    paths:
+      - 'frontend/**'
   workflow_dispatch:
 
 jobs:

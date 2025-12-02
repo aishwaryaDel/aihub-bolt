@@ -1,4 +1,4 @@
-name: Backend Docker Pipeline Trigger
+name: Backend Deployment Trigger
 
 on:
   push:
