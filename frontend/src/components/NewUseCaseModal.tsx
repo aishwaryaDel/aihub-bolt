@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Department, UseCaseStatus, UseCase } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
+import { DEPARTMENTS, STATUS_SEQUENCE, DEFAULT_VALUES } from '../config/constants';
 
 interface NewUseCaseModalProps {
   onClose: () => void;
@@ -28,13 +29,13 @@ export interface NewUseCaseData {
   };
 }
 
-const departments: Department[] = ['Marketing', 'R&D', 'Procurement', 'IT', 'HR', 'Operations'];
-const statusSequence: UseCaseStatus[] = ['Ideation', 'Pre-Evaluation', 'Evaluation', 'PoC', 'MVP', 'Live', 'Archived'];
+const departments: Department[] = DEPARTMENTS as unknown as Department[];
+const statusSequence: UseCaseStatus[] = STATUS_SEQUENCE as unknown as UseCaseStatus[];
 
 export default function NewUseCaseModal({ onClose, onSubmit, existingUseCase = null }: NewUseCaseModalProps) {
   const { t } = useLanguage();
-  const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
+  const [currentStep, setCurrentStep] = useState(DEFAULT_VALUES.STEP.INITIAL);
+  const totalSteps = DEFAULT_VALUES.STEP.TOTAL;
   const isUpdateMode = !!existingUseCase;
 
   const getAvailableStatuses = (): UseCaseStatus[] => {
@@ -57,22 +58,22 @@ export default function NewUseCaseModal({ onClose, onSubmit, existingUseCase = n
   };
 
   const [formData, setFormData] = useState<NewUseCaseData>({
-    title: '',
-    short_description: '',
-    full_description: '',
-    department: 'IT',
-    status: 'Ideation',
-    owner_name: '',
-    owner_email: '',
-    business_impact: '',
-    technology_stack: [],
-    tags: [],
-    application_url: '',
-    internal_links: {}
+    title: DEFAULT_VALUES.EMPTY_STRING,
+    short_description: DEFAULT_VALUES.EMPTY_STRING,
+    full_description: DEFAULT_VALUES.EMPTY_STRING,
+    department: DEFAULT_VALUES.DEPARTMENT,
+    status: DEFAULT_VALUES.STATUS,
+    owner_name: DEFAULT_VALUES.EMPTY_STRING,
+    owner_email: DEFAULT_VALUES.EMPTY_STRING,
+    business_impact: DEFAULT_VALUES.EMPTY_STRING,
+    technology_stack: DEFAULT_VALUES.EMPTY_ARRAY,
+    tags: DEFAULT_VALUES.EMPTY_ARRAY,
+    application_url: DEFAULT_VALUES.EMPTY_STRING,
+    internal_links: DEFAULT_VALUES.EMPTY_OBJECT
   });
 
-  const [techStackInput, setTechStackInput] = useState('');
-  const [tagsInput, setTagsInput] = useState('');
+  const [techStackInput, setTechStackInput] = useState(DEFAULT_VALUES.EMPTY_STRING);
+  const [tagsInput, setTagsInput] = useState(DEFAULT_VALUES.EMPTY_STRING);
 
   useEffect(() => {
     if (existingUseCase) {

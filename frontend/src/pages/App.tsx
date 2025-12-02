@@ -5,7 +5,7 @@ import LoginModal from '../components/LoginModal';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { UseCase } from '../types';
-import { useCaseApi } from '../services/api';
+import { useCaseApi } from '../services/usecaseApi';
 import { messages } from '../config';
 
 type Screen = 'landing' | 'overview';

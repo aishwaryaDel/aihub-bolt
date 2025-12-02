@@ -1,4 +1,5 @@
 import { useLanguage } from '../contexts/LanguageContext';
+import { EMAIL_CONSTANTS } from '../config/constants';
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -29,7 +30,7 @@ export default function Footer() {
           <div>
             <h3 className="font-bold text-gray-900 mb-4">{t('footer.support')}</h3>
             <a
-              href="mailto:ai-transformation@tesa.com"
+              href={`mailto:${EMAIL_CONSTANTS.SUPPORT_EMAIL}`}
               className="text-gray-600 hover:text-[#E30613] transition-colors duration-200"
             >
               {t('footer.contactTeam')}

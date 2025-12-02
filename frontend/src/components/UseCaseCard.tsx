@@ -1,5 +1,6 @@
 import { UseCase } from '../types';
 import { constants } from '../config';
+import { UI_CONSTANTS, ROLE_ATTRIBUTES, TAB_INDEX, KEYBOARD_KEYS } from '../config/constants';
 
 interface UseCaseCardProps {
   useCase: UseCase;
@@ -13,10 +14,10 @@ export default function UseCaseCard({ useCase, onClick }: UseCaseCardProps) {
     <div
       onClick={onClick}
       className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-[1.03]"
-      role="button"
-      tabIndex={0}
+      role={ROLE_ATTRIBUTES.BUTTON}
+      tabIndex={TAB_INDEX.FOCUSABLE}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === KEYBOARD_KEYS.ENTER || e.key === KEYBOARD_KEYS.SPACE) {
           e.preventDefault();
           onClick();
         }
@@ -52,17 +53,17 @@ export default function UseCaseCard({ useCase, onClick }: UseCaseCardProps) {
           {useCase.short_description}
         </p>
         <div className="flex flex-wrap gap-2 mb-3">
-          {useCase.tags.slice(0, 3).map((tag, index) => (
+          {useCase.tags.slice(0, UI_CONSTANTS.SLICE_LIMITS.MAX_TAGS_DISPLAY).map((tag, index) => (
             <span
               key={index}
               className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded"
             >
-              #{tag}
+              {UI_CONSTANTS.TEXT.TAG_PREFIX}{tag}
             </span>
           ))}
         </div>
         <p className="text-sm text-gray-400">
-          By {useCase.owner_name} – {useCase.department}
+          {UI_CONSTANTS.TEXT.BY_PREFIX} {useCase.owner_name} {UI_CONSTANTS.TEXT.DEPARTMENT_SEPARATOR} {useCase.department}
         </p>
       </div>
     </div>

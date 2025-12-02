@@ -1,5 +1,6 @@
 import { useLanguage } from '../contexts/LanguageContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { UI_CONSTANTS, STYLE_CONSTANTS } from '../config/constants';
 
 interface LandingPageProps {
   onStartJourney: () => void;
@@ -13,20 +14,20 @@ export default function LandingPage({ onStartJourney }: LandingPageProps) {
 
       <div className="absolute top-0 left-0 w-full h-full">
         <div className="absolute top-20 left-10 w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-1 h-1 bg-blue-300 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-        <div className="absolute bottom-32 left-1/4 w-1.5 h-1.5 bg-cyan-300 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+        <div className="absolute top-40 right-20 w-1 h-1 bg-blue-300 rounded-full animate-pulse" style={{ animationDelay: STYLE_CONSTANTS.ANIMATION.PULSE_DELAY_HALF }}></div>
+        <div className="absolute bottom-32 left-1/4 w-1.5 h-1.5 bg-cyan-300 rounded-full animate-pulse" style={{ animationDelay: STYLE_CONSTANTS.ANIMATION.PULSE_DELAY_ONE }}></div>
+        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: STYLE_CONSTANTS.ANIMATION.PULSE_DELAY_ONE_HALF }}></div>
       </div>
 
       <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
-      <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style={{ animationDelay: STYLE_CONSTANTS.ANIMATION.PULSE_DELAY_TWO }}></div>
 
       <header className="px-8 py-6 relative z-10">
         <div className="flex items-center justify-between">
           <img
-            src="/image.png"
-            alt="tesa logo"
-            className="h-12 w-auto"
+            src={UI_CONSTANTS.IMAGES.LOGO_PATH}
+            alt={UI_CONSTANTS.LOGO.ALT}
+            className={`${STYLE_CONSTANTS.SPACING.HEADER_LOGO_HEIGHT} w-auto`}
           />
           <LanguageSwitcher />
         </div>
