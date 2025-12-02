@@ -98,7 +98,7 @@ export default function UseCaseDetailModal({
               <h2 className="text-lg font-bold text-gray-900 mb-3">{t('modal.useCaseStage')}</h2>
               <div className="relative">
                 <div className="flex justify-between mb-2">
-                  {stages.map((stage, index) => (
+                  {STATUS_SEQUENCE.map((stage, index) => (
                     <div
                       key={stage}
                       className={`flex-1 text-center ${
@@ -120,7 +120,7 @@ export default function UseCaseDetailModal({
                   <div
                     className="h-full bg-[#E30613] transition-all duration-500"
                     style={{
-                      width: `${((currentStageIndex + 1) / stages.length) * 100}%`
+                      width: `${((currentStageIndex + 1) / STATUS_SEQUENCE.length) * 100}%`
                     }}
                   />
                 </div>
