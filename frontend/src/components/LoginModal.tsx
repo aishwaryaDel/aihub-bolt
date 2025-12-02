@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Eye, EyeOff, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { authApi } from '../services/api';
+import { authApi } from '../services';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
