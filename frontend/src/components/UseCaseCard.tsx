@@ -1,5 +1,5 @@
 import { UseCase } from '../types';
-import { constants } from '../config';
+import { DEFAULT_IMAGES, STATUS_COLORS, Department, UseCaseStatus } from '../constants/constants';
 
 interface UseCaseCardProps {
   useCase: UseCase;
@@ -7,8 +7,8 @@ interface UseCaseCardProps {
 }
 
 export default function UseCaseCard({ useCase, onClick }: UseCaseCardProps) {
-  const departmentImage = constants.defaultImages[useCase.department as keyof typeof constants.defaultImages];
-  const statusColor = constants.statusColors[useCase.status as keyof typeof constants.statusColors] || 'bg-gray-500';
+  const departmentImage = DEFAULT_IMAGES[useCase.department as Department];
+  const statusColor = STATUS_COLORS[useCase.status as UseCaseStatus] || 'bg-gray-500';
   return (
     <div
       onClick={onClick}

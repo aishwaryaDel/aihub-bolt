@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-
-export type Language = 'en' | 'de';
+import { Language, DEFAULT_LANGUAGE } from '../constants/constants';
 
 interface LanguageContextType {
   language: Language;
@@ -207,7 +206,7 @@ const translations: Record<Language, Record<string, string>> = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('de');
+  const [language, setLanguage] = useState<Language>(DEFAULT_LANGUAGE);
 
   const t = (key: string): string => {
     return translations[language][key] || key;

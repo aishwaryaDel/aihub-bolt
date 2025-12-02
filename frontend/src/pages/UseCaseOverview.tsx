@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useCaseApi } from '../services';
 import { Search, Home, Plus } from 'lucide-react';
-import { UseCase, Department, UseCaseStatus } from '../types';
+import { UseCase } from '../types';
 import UseCaseCard from '../components/UseCaseCard';
 import UseCaseDetailModal from '../components/UseCaseDetailModal';
 import NewUseCaseModal, { NewUseCaseData } from '../components/NewUseCaseModal';
@@ -10,6 +10,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { messages } from '../config';
+import { DEPARTMENTS, STATUS_SEQUENCE, Department, UseCaseStatus } from '../constants/constants';
 
 interface UseCaseOverviewProps {
   useCases: UseCase[];
@@ -18,26 +19,9 @@ interface UseCaseOverviewProps {
   error?: string | null;
   onRefresh?: () => void;
 }
-const departments: Array<'All' | Department> = [
-  'All',
-  'Marketing',
-  'R&D',
-  'Procurement',
-  'IT',
-  'HR',
-  'Operations'
-];
 
-const statuses: Array<'All' | UseCaseStatus> = [
-  'All',
-  'Ideation',
-  'Pre-Evaluation',
-  'Evaluation',
-  'PoC',
-  'MVP',
-  'Live',
-  'Archived'
-];
+const departments: Array<'All' | Department> = ['All', ...DEPARTMENTS];
+const statuses: Array<'All' | UseCaseStatus> = ['All', ...STATUS_SEQUENCE];
 
 export default function UseCaseOverview({ useCases, onBackToHome, isLoading = false, error = null, onRefresh }: UseCaseOverviewProps) {
   const { t } = useLanguage();

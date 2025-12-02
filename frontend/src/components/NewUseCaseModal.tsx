@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Department, UseCaseStatus, UseCase } from '../types';
+import { UseCase } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
+import { DEPARTMENTS, STATUS_SEQUENCE, Department, UseCaseStatus } from '../constants/constants';
 
 interface NewUseCaseModalProps {
   onClose: () => void;
@@ -28,9 +29,6 @@ export interface NewUseCaseData {
   };
 }
 
-const departments: Department[] = ['Marketing', 'R&D', 'Procurement', 'IT', 'HR', 'Operations'];
-const statusSequence: UseCaseStatus[] = ['Ideation', 'Pre-Evaluation', 'Evaluation', 'PoC', 'MVP', 'Live', 'Archived'];
-
 export default function NewUseCaseModal({ onClose, onSubmit, existingUseCase = null }: NewUseCaseModalProps) {
   const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
@@ -43,14 +41,14 @@ export default function NewUseCaseModal({ onClose, onSubmit, existingUseCase = n
     }
 
     if (existingUseCase) {
-      const currentStatusIndex = statusSequence.indexOf(existingUseCase.status);
+      const currentStatusIndex = STATUS_SEQUENCE.indexOf(existingUseCase.status as UseCaseStatus);
       if (currentStatusIndex === -1) return ['Ideation'];
 
-      if (currentStatusIndex === statusSequence.length - 1) {
-        return [existingUseCase.status];
+      if (currentStatusIndex === STATUS_SEQUENCE.length - 1) {
+        return [existingUseCase.status as UseCaseStatus];
       }
 
-      return [existingUseCase.status, statusSequence[currentStatusIndex + 1]];
+      return [existingUseCase.status as UseCaseStatus, STATUS_SEQUENCE[currentStatusIndex + 1]];
     }
 
     return ['Ideation'];
@@ -268,7 +266,7 @@ export default function NewUseCaseModal({ onClose, onSubmit, existingUseCase = n
                   onChange={(e) => setFormData({ ...formData, department: e.target.value as Department })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E30613] focus:border-transparent outline-none transition-all"
                 >
-                  {departments.map((dept) => (
+                  {DEPARTMENTS.map((dept) => (
                     <option key={dept} value={dept}>
                       {t(`department.${dept}`)}
                     </option>

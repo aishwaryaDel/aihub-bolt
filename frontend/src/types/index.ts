@@ -70,5 +70,4 @@ export interface User {
   role: UserRole;
 }
 
-export type Department = string;
-export type UseCaseStatus = string;
+export type { Department, UseCaseStatus } from '../constants/constants';

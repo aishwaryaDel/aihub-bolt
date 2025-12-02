@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 import { UseCase } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
-import { constants } from '../config';
+import { STATUS_SEQUENCE, DEFAULT_IMAGES, STATUS_COLORS, Department, UseCaseStatus } from '../constants/constants';
 
 interface UseCaseDetailModalProps {
   useCase: UseCase;
@@ -11,7 +11,6 @@ interface UseCaseDetailModalProps {
   onRelatedClick: (id: string) => void;
   onUpdateClick?: () => void;
 }
-const stages = ['Ideation', 'Pre-Evaluation', 'Evaluation', 'PoC', 'MVP', 'Live', 'Archived'];
 
 export default function UseCaseDetailModal({
   useCase,
@@ -22,9 +21,9 @@ export default function UseCaseDetailModal({
 }: UseCaseDetailModalProps) {
   const { t } = useLanguage();
   const { isAdmin } = useAuth();
-  const imageUrl = useCase.image_url || constants.defaultImages[useCase.department as keyof typeof constants.defaultImages];
-  const statusColor = constants.statusColors[useCase.status as keyof typeof constants.statusColors] || 'bg-gray-500';
-  const currentStageIndex = stages.indexOf(useCase.status);
+  const imageUrl = useCase.image_url || DEFAULT_IMAGES[useCase.department as Department];
+  const statusColor = STATUS_COLORS[useCase.status as UseCaseStatus] || 'bg-gray-500';
+  const currentStageIndex = STATUS_SEQUENCE.indexOf(useCase.status as UseCaseStatus);
 
   return (
     <div

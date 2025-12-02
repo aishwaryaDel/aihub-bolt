@@ -8,6 +8,16 @@
  */
 
 import { API_ROUTES, APP_ROUTES } from '../routes/routes';
+import {
+  DEPARTMENTS,
+  STATUS_SEQUENCE,
+  LANGUAGES,
+  DEFAULT_LANGUAGE,
+  STATUS_COLORS,
+  DEFAULT_IMAGES,
+  VALIDATION,
+  UI,
+} from '../constants/constants';
 
 /**
  * Environment Configuration
@@ -80,61 +90,24 @@ export const features = {
 /**
  * Application Constants
  * Reusable constants used throughout the application
+ * @deprecated Use imports from '../constants/constants' instead
  */
 export const constants = {
-  departments: ['Marketing', 'R&D', 'Procurement', 'IT', 'HR', 'Operations'] as const,
-  statuses: ['Ideation', 'Pre-Evaluation', 'Evaluation', 'PoC', 'MVP', 'Live', 'Archived'] as const,
-  languages: ['en', 'de'] as const,
-  defaultLanguage: 'de',
-
-  statusColors: {
-    Live: 'bg-green-600',
-    MVP: 'bg-blue-600',
-    PoC: 'bg-orange-500',
-    Evaluation: 'bg-yellow-600',
-    'Pre-Evaluation': 'bg-purple-600',
-    Ideation: 'bg-gray-500',
-    Archived: 'bg-gray-400',
-  },
-
-  defaultImages: {
-    Marketing: 'https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=800',
-    'R&D': 'https://images.pexels.com/photos/2280571/pexels-photo-2280571.jpeg?auto=compress&cs=tinysrgb&w=800',
-    Procurement: 'https://images.pexels.com/photos/6476589/pexels-photo-6476589.jpeg?auto=compress&cs=tinysrgb&w=800',
-    IT: 'https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=800',
-    HR: 'https://images.pexels.com/photos/5668858/pexels-photo-5668858.jpeg?auto=compress&cs=tinysrgb&w=800',
-    Operations: 'https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg?auto=compress&cs=tinysrgb&w=800',
-  },
-
-  validation: {
-    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    url: /^https?:\/\/.+/,
-    maxTitleLength: 200,
-    maxShortDescriptionLength: 300,
-    maxFullDescriptionLength: 5000,
-  },
+  departments: DEPARTMENTS,
+  statuses: STATUS_SEQUENCE,
+  languages: LANGUAGES,
+  defaultLanguage: DEFAULT_LANGUAGE,
+  statusColors: STATUS_COLORS,
+  defaultImages: DEFAULT_IMAGES,
+  validation: VALIDATION,
 } as const;
 
 /**
  * UI Configuration
  * Settings related to the user interface
+ * @deprecated Use UI from '../constants/constants' instead
  */
-export const ui = {
-  pagination: {
-    defaultPageSize: 12,
-    pageSizeOptions: [6, 12, 24, 48],
-  },
-  animation: {
-    duration: 200,
-    easing: 'ease-in-out',
-  },
-  breakpoints: {
-    mobile: 640,
-    tablet: 768,
-    desktop: 1024,
-    wide: 1280,
-  },
-} as const;
+export const ui = UI;
 
 /**
  * External Links Configuration
