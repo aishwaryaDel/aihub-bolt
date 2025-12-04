@@ -6,8 +6,8 @@ on:
       - dev
       - prod
       - main
-    paths:
-      - 'frontend/**'
+    paths-ignore:
+      - 'backend/**'
   workflow_dispatch:
 
 jobs:
@@ -23,13 +23,13 @@ jobs:
           echo "Target Environment: dev"
 
   # ---------------------- DEV ----------------------
-  # build-and-push-dev:
-  #   name: Dev
-  #   needs: setup
-  #   uses: Central-DIT/tesa-app-deploy/.github/workflows/Frontend_docker_deploy.yml@main
-  #   with:
-  #     environment: "dev"
-  #     image_name: "ui-dev"
-  #     app_info: ${{ vars.APP_INFO_DEV }}  # App info from GitHub variable
-  #   secrets:
-  #     azure_creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+  build-and-push-dev:
+    name: Dev
+    needs: setup
+    uses: Central-DIT/tesa-app-deploy/.github/workflows/Frontend_docker_deploy.yml@main
+    with:
+      environment: "dev"
+      image_name: "ui-dev"
+      app_info: ${{ vars.APP_INFO_DEV }}  # App info from GitHub variable
+    secrets:
+      azure_creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
