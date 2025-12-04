@@ -20,14 +20,7 @@ RUN npm run test --if-present
 # Accept VITE_ build args and inject them into .env
 ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
-RUN case "$VITE_API_BASE_URL" in \
-	*/api|*/api/) \
-		echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" > .env ;; \
-	*/) \
-		echo "VITE_API_BASE_URL=${VITE_API_BASE_URL}api" > .env ;; \
-	*) \
-		echo "VITE_API_BASE_URL=${VITE_API_BASE_URL}/api" > .env ;; \
-esac
+RUN echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" >> .env
 
 # Production Build erzeugen (Vite legt Output in /app/dist)
 RUN npm run build
